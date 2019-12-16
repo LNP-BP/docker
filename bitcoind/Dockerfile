@@ -1,4 +1,4 @@
-FROM debian:stretch-slim as builder
+FROM debian:buster-slim as builder
 
 RUN apt-get update -y \
     && apt-get install -y \
@@ -47,20 +47,20 @@ RUN make install
 
 
 
-FROM debian:stretch-slim
+FROM debian:buster-slim
 
 LABEL maintainer.0="Dr Maxim Orlovsky <orlovsky@pandoracore.com>"
 
 RUN apt-get update -y \
     && apt-get install -y \
         curl \
-        libboost-chrono1.62.0 \
-        libboost-filesystem1.62.0 \
-        libboost-system1.62.0 \
-        libboost-thread1.62.0 \
-        libevent-2.0-5 \
-        libevent-pthreads-2.0-5 \
-        libminiupnpc10 \
+        libboost-chrono1.67.0 \
+        libboost-filesystem1.67.0 \
+        libboost-system1.67.0 \
+        libboost-thread1.67.0 \
+        libevent-2.1-6 \
+        libevent-pthreads-2.1-6 \
+        libminiupnpc17 \
         libssl1.1 \
         libzmq5 \
     && apt-get clean \
@@ -80,6 +80,4 @@ RUN groupadd -r bitcoin && useradd -r -m -g bitcoin bitcoin \
 
 EXPOSE 8332 8333 18332 18333 18443 18444 38332 38333
 
-ENTRYPOINT ["bitcoind", "-txindex", "-dataddir=\"$BITCOIN_DATA\""]
-
-# CMD [""]
+ENTRYPOINT bitcoind -txindex -datadir=$BITCOIN_DATA
