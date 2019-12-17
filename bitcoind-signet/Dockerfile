@@ -22,13 +22,11 @@ RUN apt-get update -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ENV BITCOIN_VERSION=0.19.0.1
+ENV BITCOIN_VERSION=0.18.0
 ENV BITCOIN_SRC=/usr/local/src/bitcoin
 ENV BITCOIN_BIN=/bitcoin
 
-RUN git clone -n https://github.com/bitcoin/bitcoin.git $BITCOIN_SRC \
-    && cd $BITCOIN_SRC \
-    && git checkout tags/v$BITCOIN_VERSION
+RUN git clone https://github.com/kallewoof/bitcoin.git --branch signet-0.18 $BITCOIN_SRC
 
 WORKDIR $BITCOIN_SRC
 
@@ -70,7 +68,7 @@ COPY --from=builder /bitcoin/bin /usr/local/bin
 
 VOLUME "/var/lib/bitcoind"
 
-ENV BITCOIN_VERSION=0.19.0.1
+ENV BITCOIN_VERSION=0.18.0
 ENV BITCOIN_DATA=/var/lib/bitcoind
 
 RUN groupadd -r bitcoin && useradd -r -m -g bitcoin bitcoin \
@@ -80,4 +78,4 @@ RUN groupadd -r bitcoin && useradd -r -m -g bitcoin bitcoin \
 
 EXPOSE 8332 8333 18332 18333 18443 18444 38332 38333
 
-ENTRYPOINT ["/bin/bash", "-c", "bitcoind -txindex -datadir=$BITCOIN_DATA"]
+ENTRYPOINT ["/bin/bash", "-c", "bitcoind -txindex -datadir=$BITCOIN_DATA -signet"]
