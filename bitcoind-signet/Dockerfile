@@ -26,7 +26,7 @@ ENV BITCOIN_VERSION=0.18.0
 ENV BITCOIN_SRC=/usr/local/src/bitcoin
 ENV BITCOIN_BIN=/bitcoin
 
-RUN git clone https://github.com/kallewoof/bitcoin.git --branch signet-0.18 $BITCOIN_SRC
+RUN git clone https://github.com/kallewoof/bitcoin.git --branch signet $BITCOIN_SRC
 
 WORKDIR $BITCOIN_SRC
 
