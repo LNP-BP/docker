@@ -3,18 +3,51 @@ services:
   bitcoin-mainnet:
     container_name: bitcoind
     image: lnpbp/bitcoind:latest
+    command:
+      - "-txindex -rpcuser=bitcoin -rpcpassword=bitcoin"
     ports:
-      - "8332"
-      - "8333" # Remove this if you do not wish for the external nodes to connect to this node
+      - "8332:8332"
+      - "8333:8333" # Remove this if you do not wish for the external nodes to connect to this node
     volumes:
       - "blockchain:/var/lib/bitcoind"
+
   bitcoin-signet:
     container_name: bitcoind-signet
     image: lnpbp/bitcoind-signet:latest
+    command:
+      - "-txindex -rpcuser=bitcoin -rpcpassword=bitcoin"
     ports:
-      - "38332"
-      - "38333" # Remove this if you do not wish for the external nodes to connect to this node
+      - "38332:38332"
+      - "38333:38332" # Remove this if you do not wish for the external nodes to connect to this node
     volumes:
       - "blockchain:/var/lib/bitcoind"
+
+  lightning-mainnet:
+    container_name: lightningd
+    image: lnpbp/lightningd:latest
+    entrypoint:
+      - "/bin/bash"
+      - "-c"
+      - "lightningd --mainnet --lightning-dir=$LIGHTNING_DATA --bitcoin-rpcconnect=bitcoind --bitcoin-rpcuser=bitcoin --bitcoin-rpcpassword=bitcoin"
+    ports:
+      - "9735:9735"
+      - "9835:9835"
+    volumes:
+      - "channels:/var/lib/lightningd"
+
+  lightning-signet:
+    container_name: lightningd
+    image: lnpbp/lightningd:latest
+    entrypoint:
+      - "/bin/bash"
+      - "-c"
+      - "lightningd --signet --lightning-dir=$LIGHTNING_DATA --bitcoin-rpcconnect=bitcoind-signet --bitcoin-rpcuser=bitcoin --bitcoin-rpcpassword=bitcoin"
+    ports:
+      - "9735:9735"
+      - "9835:9835"
+    volumes:
+      - "channels:/var/lib/lightningd"
+
 volumes:
   blockchain:
+  channels:
