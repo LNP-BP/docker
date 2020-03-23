@@ -2,14 +2,33 @@ version: '3'
 services:
   bitcoin-mainnet:
     container_name: bitcoind
-    image: lnpbp/bitcoind:latest
+    # image: lnpbp/bitcoind:latest
+    build: bitcoind
     command:
       - "-txindex -rpcuser=bitcoin -rpcpassword=bitcoin"
     ports:
       - "8332:8332"
       - "8333:8333" # Remove this if you do not wish for the external nodes to connect to this node
+    expose:
+      - "8333"
     volumes:
-      - "blockchain:/var/lib/bitcoind"
+      - "/private/var/lib/bitcoin:/var/lib/bitcoind"
+    networks:
+      - "mainnet"
+
+  electrs-mainnet:
+    container_name: electrs
+    build: electrs
+    command:
+      - "--daemon-rpc-addr bitcoin-mainnet"
+    ports:
+      - "50001:50001"
+      - "4224:4224"
+    volumes:
+      - "/private/var/lib/bitcoin:/var/lib/bitcoind"
+      - "/private/var/lib/electrs:/var/lib/electrs"
+    networks:
+      - "mainnet"
 
   bitcoin-signet:
     container_name: bitcoind-signet
@@ -20,7 +39,7 @@ services:
       - "38332:38332"
       - "38333:38332" # Remove this if you do not wish for the external nodes to connect to this node
     volumes:
-      - "blockchain:/var/lib/bitcoind"
+      - "/private/var/lib/bitcoin:/var/lib/bitcoind"
 
   lightning-mainnet:
     container_name: lightningd
@@ -33,7 +52,9 @@ services:
       - "9735:9735"
       - "9835:9835"
     volumes:
-      - "channels:/var/lib/lightningd"
+      - "/private/var/lib/lightning:/var/lib/lightningd"
+    networks:
+      - "mainnet"
 
   lightning-signet:
     container_name: lightningd
@@ -46,8 +67,13 @@ services:
       - "9735:9735"
       - "9835:9835"
     volumes:
-      - "channels:/var/lib/lightningd"
+      - "/private/var/lib/lightning:/var/lib/lightningd"
 
-volumes:
-  blockchain:
-  channels:
+# volumes:
+#   blockchain:
+#   channels:
+#   electrs:
+
+networks:
+  mainnet:
+    driver: bridge

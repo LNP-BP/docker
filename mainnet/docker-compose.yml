@@ -1,0 +1,49 @@
+version: '3'
+services:
+  bitcoind-mainnet:
+    container_name: bitcoind-mainnet
+    build: ../bitcoind
+    command:
+      - "-txindex -rpcuser=bitcoin -rpcpassword=bitcoin"
+    ports:
+      - "8332:8332" # Remove this if you do not wish for the external nodes to connect to this node
+      - "8333:8333"
+    expose:
+      - "8332"
+    volumes:
+      - "/private/var/lib/bitcoin:/var/lib/bitcoind"
+    networks:
+      - "bitcoinrpc"
+
+  bitcoin-cli:
+    container_name: bitcoin-cli
+    build: ../bitcoind
+    entrypoint: "bitcoin-cli -rpcconnect=bitcoind"
+    networks:
+      - "bitcoinrpc"
+
+  electrs-mainnet:
+    container_name: electrs-mainnet
+    build: ../electrs
+    depends_on:
+      - bitcoind-mainnet
+    environment:
+      BITCOIN_HOST: "bitcoind-mainnet:8332"
+    ports:
+      - "50001:50001"
+      - "4224:4224"
+    volumes:
+      - "/private/var/lib/bitcoin:/var/lib/bitcoind"
+      - "/private/var/lib/electrs:/var/lib/electrs"
+    networks:
+      - "bitcoinrpc"
+
+  netshoot:
+    image: nicolaka/netshoot
+    entrypoint: "/bin/bash"
+    networks:
+      - "bitcoinrpc"
+
+networks:
+  bitcoinrpc:
+    driver: bridge
