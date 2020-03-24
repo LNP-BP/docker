@@ -58,4 +58,4 @@ EXPOSE 4224
 
 STOPSIGNAL SIGINT
 
-ENTRYPOINT ["/bin/bash", "-c", "/usr/local/bin/electrs -vvvv --daemon-dir $BITCOIN_DATA --db-dir $ELECTRS_DATA --conf $ELECTRS_CONF --daemon-rpc-addr $BITCOIN_HOST"]
+ENTRYPOINT ["/bin/bash", "-c", "/usr/local/bin/electrs -vvvv --daemon-dir $BITCOIN_DATA --db-dir $ELECTRS_DATA --conf $ELECTRS_CONF "]

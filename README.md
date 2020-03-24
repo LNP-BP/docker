@@ -2,10 +2,15 @@
 
 This containers are maintained by LNP/BP Standards Association
 
-- **Bitcoin Core**: https://hub.docker.com/repository/docker/lnpbp/bitcoind
-  Minimalistic build without wallet (but with ZMQ) on Debian
-- **Bitcoin Core** for SigNet: https://hub.docker.com/repository/docker/lnpbp/bitcoind-signet
-  Minimalistic build without wallet (but with ZMQ) on Debian
+- **Bitcoin Core**: <https://hub.docker.com/r/lnpbp/bitcoind>
+  Minimalistic build without wallet (but with ZMQ) on Debian Buster
+- **Bitcoin Core** for SigNet: <https://hub.docker.com/r/lnpbp/bitcoind-signet>
+  Minimalistic build of the original SigNet fork without wallet (but with ZMQ)
+  on Debian Buster
+- **c-Lightning**: <https://hub.docker.com/r/lnpbp/lightningd>
+  Standard c-lightning build
+- **Electrs**:
+  Rust implementation of the Electrum server
 
 ## Quickstart
 
@@ -19,7 +24,8 @@ This containers are maintained by LNP/BP Standards Association
     docker volume create blockchain
     docker run --rm -v $PWD:/source -v blockchain:/dest -w /source scratch cp ./bitcoin.conf /dest
     ```
-2. Perform `docker-compose up` command
+2. Go to the `mainnet`, `signet` or `liquid` directory and perform 
+   `docker-compose up` command
 
 Now you will have bitcoind running for mainnet and signet with JSON-RPC interface opened for the local machine.
 You will be able to access it with the user name `bitcoin` and password `bitcoin`.

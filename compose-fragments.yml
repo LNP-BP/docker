@@ -1,0 +1,38 @@
+version: '3'
+services:
+  lightning-mainnet:
+    container_name: lightningd
+    image: lnpbp/lightningd:latest
+    entrypoint:
+      - "/bin/bash"
+      - "-c"
+      - "lightningd --mainnet --lightning-dir=$LIGHTNING_DATA --bitcoin-rpcconnect=bitcoind --bitcoin-rpcuser=bitcoin --bitcoin-rpcpassword=bitcoin"
+    ports:
+      - "9735:9735"
+      - "9835:9835"
+    volumes:
+      - "/private/var/lib/lightning:/var/lib/lightningd"
+    networks:
+      - "mainnet"
+
+  lightning-signet:
+    container_name: lightningd
+    image: lnpbp/lightningd:latest
+    entrypoint:
+      - "/bin/bash"
+      - "-c"
+      - "lightningd --signet --lightning-dir=$LIGHTNING_DATA --bitcoin-rpcconnect=bitcoind-signet --bitcoin-rpcuser=bitcoin --bitcoin-rpcpassword=bitcoin"
+    ports:
+      - "9735:9735"
+      - "9835:9835"
+    volumes:
+      - "/private/var/lib/lightning:/var/lib/lightningd"
+
+# volumes:
+#   blockchain:
+#   channels:
+#   electrs:
+
+networks:
+  mainnet:
+    driver: bridge
