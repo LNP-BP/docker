@@ -83,6 +83,6 @@ RUN groupadd -r bitcoin && useradd -r -m -g bitcoin bitcoin \
     && chmod 700 "$BITCOIN_DATA" \
     && chown -R bitcoin:bitcoin "$BITCOIN_DATA"
 
-EXPOSE 8332 8333 18332 18333 18443 18444 38332 38333
+EXPOSE 8332 8333 18332 18333 18443 18444
 
 ENTRYPOINT bitcoind -txindex -datadir=$BITCOIN_DATA

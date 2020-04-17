@@ -1,0 +1,64 @@
+version: '3.2'
+services:
+  bitcoind-signet:
+    container_name: bitcoind-signet
+    build: ../bitcoind-signet
+    restart: unless-stopped
+    command:
+      - "-rpcuser=bitcoin -rpcpassword=bitcoin"
+    ports:
+      - 38332:38332 # Remove this if you do not wish for the external nodes to connect to this node
+      - 38333:38333
+    expose:
+      - 38332
+    volumes:
+      - bitcoin:/var/lib/bitcoin
+    networks:
+      - bitcoinrpc
+
+  electrs-signet:
+    container_name: electrs-signet
+    build: ../electrs
+    restart: unless-stopped
+    depends_on:
+      - bitcoind-signet
+    environment:
+      ELECTRS_DAEMON_RPC_ADDR: "bitcoind-signet:38332"
+      ELECTRS_ELECTRUM_RPC_ADDR: "electrs-signet:50003"
+      ELECTRS_MONITORING_ADDR: "electrs-signet:4223"
+    ports:
+      - 50003:50003
+      - 4223:4223
+    volumes:
+      - type: volume
+        source: bitcoin
+        target: /var/lib/bitcoin
+        read_only: true
+        volume:
+          nocopy: true
+      - type: volume
+        source: electrs
+        target: /var/lib/electrs
+        read_only: false
+        volume:
+          nocopy: true
+    networks:
+      - bitcoinrpc
+
+volumes:
+  bitcoin:
+    driver: local
+    driver_opts:
+      type: none
+      device: /private/var/lib/bitcoin
+      o: bind
+  electrs:
+    driver: local
+    driver_opts:
+      type: none
+      device: /private/var/lib/electrs
+      o: bind
+
+networks:
+  bitcoinrpc:
+    driver: bridge

@@ -66,16 +66,16 @@ RUN apt-get update -y \
 
 COPY --from=builder /bitcoin/bin /usr/local/bin
 
-VOLUME "/var/lib/bitcoind"
+VOLUME "/var/lib/bitcoin"
 
 ENV BITCOIN_VERSION=0.18.0
-ENV BITCOIN_DATA=/var/lib/bitcoind
+ENV BITCOIN_DATA=/var/lib/bitcoin
 
 RUN groupadd -r bitcoin && useradd -r -m -g bitcoin bitcoin \
     && mkdir -p "$BITCOIN_DATA" \
     && chmod 700 "$BITCOIN_DATA" \
     && chown -R bitcoin:bitcoin "$BITCOIN_DATA"
 
-EXPOSE 8332 8333 18332 18333 18443 18444 38332 38333
+EXPOSE 38332 38333
 
 ENTRYPOINT ["/bin/bash", "-c", "bitcoind -txindex -datadir=$BITCOIN_DATA -signet"]
