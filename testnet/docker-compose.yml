@@ -1,41 +1,39 @@
 version: '3.2'
 services:
-  bitcoind-signet:
-    container_name: bitcoind-signet
-    build: ../bitcoind-signet
+  bitcoind-testnet:
+    container_name: bitcoind-testnet
+    build: ../bitcoind
     restart: unless-stopped
     command:
       - "-rpcuser=bitcoin -rpcpassword=bitcoin"
     ports:
-      - 38332:38332 # Remove this if you do not wish for the external nodes to connect to this node
-      - 38333:38333
+      - 18332:18332 # Remove this if you do not wish for the external nodes to connect to this node
+      - 18333:18333
     expose:
-      - 38332
-      - 38333
+      - 18332
     volumes:
-      - bitcoin:/var/lib/bitcoin
+      - bitcoin:/var/lib/bitcoind
     networks:
       - bitcoinrpc
 
-  electrs-signet:
-    container_name: electrs-signet
-    build: ../electrs-signet
+  electrs-testnet:
+    container_name: electrs-testnet
+    build: ../electrs
     restart: unless-stopped
     depends_on:
-      - bitcoind-signet
+      - bitcoind-testnet
     environment:
-      ELECTRS_DAEMON_RPC_ADDR: "bitcoind-signet:38332"
-      ELECTRS_ELECTRUM_RPC_ADDR: "electrs-signet:60601"
-      ELECTRS_MONITORING_ADDR: "electrs-signet:34224"
+      ELECTRS_NETWORK: "testnet"
+      ELECTRS_DAEMON_RPC_ADDR: "bitcoind-testnet:18332"
+      ELECTRS_ELECTRUM_RPC_ADDR: "electrs-testnet:60001"
+      ELECTRS_MONITORING_ADDR: "electrs-testnet:14223"
     ports:
-      - 60601:60601
-      - 34224:34224
-    expose:
-      - 60601
+      - 60001:60001
+      - 4223:4223
     volumes:
       - type: volume
         source: bitcoin
-        target: /var/lib/bitcoin
+        target: /var/lib/bitcoind
         read_only: true
         volume:
           nocopy: true
@@ -53,13 +51,13 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: /var/lib/bitcoin
+      device: /private/var/lib/bitcoin
       o: bind
   electrs:
     driver: local
     driver_opts:
       type: none
-      device: /var/lib/electrs
+      device: /private/var/lib/electrs
       o: bind
 
 networks:

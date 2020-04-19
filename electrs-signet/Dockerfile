@@ -9,13 +9,12 @@ RUN apt-get update -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ENV ELECTRS_VERSION=0.8.3
 ENV ELECTRS_SRC=/usr/local/src/electrs
 ENV ELECTRS_BIN=/usr/local/bin
 
-RUN git clone -n https://github.com/romanz/electrs.git $ELECTRS_SRC \
+RUN git clone -n https://github.com/dr-orlovsky/electrs.git $ELECTRS_SRC \
     && cd $ELECTRS_SRC \
-    && git checkout tags/v$ELECTRS_VERSION
+    && git checkout signet
 
 WORKDIR $ELECTRS_SRC
 
@@ -50,16 +49,12 @@ RUN groupadd -r electrs && useradd -r -m -g electrs electrs \
 VOLUME "/var/lib/bitcoind"
 VOLUME "/var/lib/electrs"
 
-# Electrum RPC: mainnet, testnet and signet
-EXPOSE 50001
-EXPOSE 60001
-EXPOSE 60002
+# Electrum X RPC port for signet
+EXPOSE 34224
 
-# Prometheus monitoring: mainnet, testnet and signet
-EXPOSE 4224
-EXPOSE 4223
-EXPOSE 4222
+# Prometheus monitoring: for signet
+EXPOSE 34224
 
 STOPSIGNAL SIGINT
 
-ENTRYPOINT ["/bin/bash", "-c", "/usr/local/bin/electrs -vvvv --daemon-dir $BITCOIN_DATA --db-dir $ELECTRS_DATA --conf $ELECTRS_CONF "]
+ENTRYPOINT ["/bin/bash", "-c", "/usr/local/bin/electrs -vvvv --network signet --daemon-dir $BITCOIN_DATA --db-dir $ELECTRS_DATA --conf $ELECTRS_CONF "]
