@@ -1,0 +1,20 @@
+#!/bin/bash
+
+args=("$@")
+
+# if the mainchain RPC is set, make sure it's not in still in IBD
+if [[ ! -z "${MAINCHAIN_RPC_PASSWORD}" ]]; then
+    while elements-cli -rpcconnect=$MAINCHAIN_RPC_HOST -rpcport=$MAINCHAIN_RPC_PORT -rpcuser=$MAINCHAIN_RPC_USER -rpcpassword=$MAINCHAIN_RPC_PASSWORD getblockchaininfo | jq -e '.initialblockdownload == true'; do
+        echo "bitcoind is still in IBD... waiting 60 seconds"
+        sleep 60
+    done
+
+    args+=("-mainchainrpcuser=${MAINCHAIN_RPC_USER}")
+    args+=("-mainchainrpcpassword=${MAINCHAIN_RPC_PASSWORD}")
+    args+=("-mainchainrpchost=${MAINCHAIN_RPC_HOST}")
+    args+=("-mainchainrpcport=${MAINCHAIN_RPC_PORT}")
+else
+    args+=("-validatepegin=0")
+fi
+
+exec elementsd -txindex -datadir=$ELEMENTS_DATA "${args[@]}"

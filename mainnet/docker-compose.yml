@@ -16,6 +16,27 @@ services:
     networks:
       - bitcoinrpc
 
+  elementsd-mainnet:
+    container_name: elementsd-mainnet
+    build: ../elementsd
+    restart: unless-stopped
+    depends_on:
+      - bitcoind-mainnet
+    environment:
+      MAINCHAIN_RPC_USER: "bitcoin"
+      MAINCHAIN_RPC_PASSWORD: "bitcoin"
+      MAINCHAIN_RPC_HOST: "bitcoind-mainnet"
+      MAINCHAIN_RPC_PORT: "8332"
+    ports:
+      - 7041:7041 # Remove this if you do not wish for the external nodes to connect to this node
+      - 7042:7042
+    expose:
+      - 7041
+    volumes:
+      - elements:/var/lib/elementsd
+    networks:
+      - bitcoinrpc
+
   electrs-mainnet:
     container_name: electrs-mainnet
     build: ../electrs
@@ -51,6 +72,12 @@ volumes:
     driver_opts:
       type: none
       device: /private/var/lib/bitcoin
+      o: bind
+  elements:
+    driver: local
+    driver_opts:
+      type: none
+      device: /private/var/lib/elements
       o: bind
   electrs:
     driver: local
