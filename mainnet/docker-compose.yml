@@ -68,23 +68,11 @@ services:
 
 volumes:
   bitcoin:
-    driver: local
-    driver_opts:
-      type: none
-      device: /private/var/lib/bitcoin
-      o: bind
+      external: "${BITCOIN_VOLUME_EXTERNAL:-false}"
   elements:
-    driver: local
-    driver_opts:
-      type: none
-      device: /private/var/lib/elements
-      o: bind
+      external: "${ELEMENTS_VOLUME_EXTERNAL:-false}"
   electrs:
-    driver: local
-    driver_opts:
-      type: none
-      device: /private/var/lib/electrs
-      o: bind
+      external: "${ELECTRS_VOLUME_EXTERNAL:-false}"
 
 networks:
   bitcoinrpc:
