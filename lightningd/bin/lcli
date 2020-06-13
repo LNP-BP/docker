@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+exec lightning-cli --lightning-dir=$LIGHTNING_DATA "$@"

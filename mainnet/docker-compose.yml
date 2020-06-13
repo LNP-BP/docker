@@ -66,6 +66,28 @@ services:
     networks:
       - bitcoinrpc
 
+  lightningd-mainnet:
+    container_name: lightningd-mainnet
+    build: ../lightningd
+    restart: unless-stopped
+    depends_on:
+      - bitcoind-mainnet
+    environment:
+      BITCOIN_RPC_USER: "bitcoin"
+      BITCOIN_RPC_PASSWORD: "bitcoin"
+      BITCOIN_RPC_CONNECT: "bitcoind-mainnet"
+      BITCOIN_RPC_PORT: "8332"
+      LIGHTNING_NETWORK_FLAG: "--mainnet"
+      LIGHTNING_LOG_LEVEL: "debug"
+    ports:
+      - 9735:9735
+    expose:
+      - 9735
+    volumes:
+      - lightning:/var/lib/lightning
+    networks:
+      - bitcoinrpc
+
 volumes:
   bitcoin:
       external: "${BITCOIN_VOLUME_EXTERNAL:-false}"
@@ -73,6 +95,8 @@ volumes:
       external: "${ELEMENTS_VOLUME_EXTERNAL:-false}"
   electrs:
       external: "${ELECTRS_VOLUME_EXTERNAL:-false}"
+  lightning:
+      external: "${LIGHTNING_VOLUME_EXTERNAL:-false}"
 
 networks:
   bitcoinrpc:
