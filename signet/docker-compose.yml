@@ -48,19 +48,35 @@ services:
     networks:
       - bitcoinrpc
 
+  lightningd-signet:
+    container_name: lightningd-signet
+    build: ../lightningd
+    restart: unless-stopped
+    depends_on:
+      - bitcoind-signet
+    environment:
+      BITCOIN_RPC_USER: "bitcoin"
+      BITCOIN_RPC_PASSWORD: "bitcoin"
+      BITCOIN_RPC_CONNECT: "bitcoind-signet"
+      BITCOIN_RPC_PORT: "38332"
+      LIGHTNING_NETWORK_FLAG: "--signet"
+      LIGHTNING_LOG_LEVEL: "debug"
+    ports:
+      - 9735:9735
+    expose:
+      - 9735
+    volumes:
+      - lightning:/var/lib/lightning
+    networks:
+      - bitcoinrpc
+
 volumes:
   bitcoin:
-    driver: local
-    driver_opts:
-      type: none
-      device: /var/lib/bitcoin
-      o: bind
+      external: "${BITCOIN_VOLUME_EXTERNAL:-false}"
   electrs:
-    driver: local
-    driver_opts:
-      type: none
-      device: /var/lib/electrs
-      o: bind
+      external: "${ELECTRS_VOLUME_EXTERNAL:-false}"
+  lightning:
+      external: "${LIGHTNING_VOLUME_EXTERNAL:-false}"
 
 networks:
   bitcoinrpc:
