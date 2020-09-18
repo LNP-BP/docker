@@ -2,7 +2,7 @@ version: '3.2'
 services:
   bitcoind-mainnet:
     container_name: bitcoind-mainnet
-    build: ../bitcoind
+    image: lnpbp/bitcoind:latest
     restart: unless-stopped
     command:
       - "-rpcuser=bitcoin -rpcpassword=bitcoin"
@@ -39,7 +39,7 @@ services:
 
   electrs-mainnet:
     container_name: electrs-mainnet
-    build: ../electrs
+    image: lnpbp/electrs:latest
     restart: unless-stopped
     depends_on:
       - bitcoind-mainnet

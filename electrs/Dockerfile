@@ -9,7 +9,7 @@ RUN apt-get update -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ENV ELECTRS_VERSION=0.8.3
+ENV ELECTRS_VERSION=0.8.5
 ENV ELECTRS_SRC=/usr/local/src/electrs
 ENV ELECTRS_BIN=/usr/local/bin
 
