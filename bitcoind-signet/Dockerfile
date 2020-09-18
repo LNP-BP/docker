@@ -7,6 +7,8 @@ RUN apt-get update -y \
         bsdmainutils \
         build-essential \
         git \
+	libdb-dev \
+	libdb++-dev \
         libboost-chrono-dev \
         libboost-filesystem-dev \
         libboost-system-dev \
@@ -22,11 +24,10 @@ RUN apt-get update -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ENV BITCOIN_VERSION=0.18.0
 ENV BITCOIN_SRC=/usr/local/src/bitcoin
 ENV BITCOIN_BIN=/bitcoin
 
-RUN git clone https://github.com/kallewoof/bitcoin.git --branch signet $BITCOIN_SRC
+RUN git clone https://github.com/kallewoof/bitcoin.git --branch 2003-signet-consensus $BITCOIN_SRC
 
 WORKDIR $BITCOIN_SRC
 
@@ -34,7 +35,7 @@ RUN ./autogen.sh
 
 RUN mkdir $BITCOIN_BIN
 
-RUN  ./configure --disable-tests --disable-bench --disable-wallet --without-gui --prefix=$BITCOIN_BIN
+RUN  ./configure --with-incompatible-bdb --disable-tests --disable-bench --without-gui --prefix=$BITCOIN_BIN
 
 RUN V=1 make clean
 
@@ -51,7 +52,7 @@ LABEL maintainer.0="Dr Maxim Orlovsky <orlovsky@pandoracore.com>"
 
 RUN apt-get update -y \
     && apt-get install -y \
-        curl \
+	curl \
         libboost-chrono1.67.0 \
         libboost-filesystem1.67.0 \
         libboost-system1.67.0 \
@@ -61,6 +62,7 @@ RUN apt-get update -y \
         libminiupnpc17 \
         libssl1.1 \
         libzmq5 \
+	libdb5.3++ \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 

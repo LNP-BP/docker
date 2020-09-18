@@ -54,8 +54,12 @@ bitcoin-cli -rpcuser=bitcoin -rpcpassword=bitcoin -rpcport=38332 getblockchainin
 
 ## Changing blockchain directory location
 
-If you would like to allocate the blockchain data storage to some specific place, you will need to either edit
-`docker-compose.yml` file or create docker container from the command line.
+You can use your axisting bitcoin blockchain directory by first creating docker volume pointing to it
+with
+```shell script
+docker volume create --driver local --opt o=bind --opt type=none --opt device=/var/lib/bitcoin bitcoin 
+```
+command and then by starting docker-compose with `--env=external.env` option
 
 ### Editing compose file
 

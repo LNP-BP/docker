@@ -22,7 +22,7 @@ RUN apt-get update -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ENV BITCOIN_VERSION=0.19.0.1
+ENV BITCOIN_VERSION=0.20.1
 ENV BITCOIN_SRC=/usr/local/src/bitcoin
 ENV BITCOIN_BIN=/bitcoin
 
@@ -70,7 +70,7 @@ COPY --from=builder /bitcoin/bin /usr/local/bin
 
 VOLUME "/var/lib/bitcoind"
 
-ENV BITCOIN_VERSION=0.19.0.1
+ENV BITCOIN_VERSION=0.20.1
 ENV BITCOIN_DATA=/var/lib/bitcoind
 
 RUN groupadd -r bitcoin && useradd -r -m -g bitcoin bitcoin \

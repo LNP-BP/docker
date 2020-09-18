@@ -2,7 +2,7 @@ version: '3.2'
 services:
   bitcoind-signet:
     container_name: bitcoind-signet
-    build: ../bitcoind-signet
+    image: lnpbp/bitcoind:signet
     restart: unless-stopped
     command:
       - "-rpcuser=bitcoin -rpcpassword=bitcoin"
