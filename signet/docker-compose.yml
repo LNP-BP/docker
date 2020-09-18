@@ -19,7 +19,7 @@ services:
 
   electrs-signet:
     container_name: electrs-signet
-    build: ../electrs-signet
+    image: lnpbp/electrs:signet
     restart: unless-stopped
     depends_on:
       - bitcoind-signet
@@ -50,7 +50,7 @@ services:
 
   lightningd-signet:
     container_name: lightningd-signet
-    build: ../lightningd
+    image: lnpbp/lightningd:signet
     restart: unless-stopped
     depends_on:
       - bitcoind-signet
@@ -62,9 +62,9 @@ services:
       LIGHTNING_NETWORK_FLAG: "--signet"
       LIGHTNING_LOG_LEVEL: "debug"
     ports:
-      - 9735:9735
+      - 39735:39735
     expose:
-      - 9735
+      - 39735
     volumes:
       - lightning:/var/lib/lightning
     networks:

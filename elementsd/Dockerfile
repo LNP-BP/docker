@@ -22,7 +22,7 @@ RUN apt-get update -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ENV ELEMENTS_VERSION=0.18.1.7
+ENV ELEMENTS_VERSION=0.18.1.8
 ENV ELEMENTS_SRC=/usr/local/src/elements
 ENV ELEMENTS_BIN=/elements
 

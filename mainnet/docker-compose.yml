@@ -16,9 +16,9 @@ services:
     networks:
       - bitcoinrpc
 
-  elementsd-mainnet:
-    container_name: elementsd-mainnet
-    build: ../elementsd
+  elementsd-liquidv1:
+    container_name: elementsd-liquidv1
+    image: lnpbp/elementsd:latest
     restart: unless-stopped
     depends_on:
       - bitcoind-mainnet
@@ -27,6 +27,7 @@ services:
       MAINCHAIN_RPC_PASSWORD: "bitcoin"
       MAINCHAIN_RPC_HOST: "bitcoind-mainnet"
       MAINCHAIN_RPC_PORT: "8332"
+    command: -chain=liquidv1
     ports:
       - 7041:7041 # Remove this if you do not wish for the external nodes to connect to this node
       - 7042:7042
@@ -68,7 +69,7 @@ services:
 
   lightningd-mainnet:
     container_name: lightningd-mainnet
-    build: ../lightningd
+    image: lnpbp/lightningd:latest
     restart: unless-stopped
     depends_on:
       - bitcoind-mainnet

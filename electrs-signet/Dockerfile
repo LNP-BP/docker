@@ -1,4 +1,4 @@
-FROM rust:slim as builder
+FROM rust:1.44.1-slim-buster as builder
 
 RUN apt-get update -y \
     && apt-get install -y \
