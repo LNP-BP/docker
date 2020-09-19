@@ -54,7 +54,7 @@ services:
     volumes:
       - type: volume
         source: bitcoin
-        target: /var/lib/bitcoind
+        target: /var/lib/bitcoin
         read_only: true
         volume:
           nocopy: true
@@ -85,7 +85,7 @@ services:
     expose:
       - 9735
     volumes:
-      - lightning:/var/lib/lightning
+      - lightning:/var/lib/lightningd
     networks:
       - bitcoinrpc
 

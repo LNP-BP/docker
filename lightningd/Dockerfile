@@ -23,7 +23,7 @@ RUN apt-get update -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ENV LIGHTNING_VERSION=0.8.0
+ENV LIGHTNING_VERSION=0.9.1
 ENV LIGHTNING_SRC=/usr/local/src/lightning
 ENV LIGHTNING_BIN=/lightning
 
@@ -55,7 +55,7 @@ RUN apt-get update -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ARG BITCOIN_VERSION=0.19.0.1
+ARG BITCOIN_VERSION=0.20.1
 ENV BITCOIN_TARBALL bitcoin-${BITCOIN_VERSION}-x86_64-linux-gnu.tar.gz
 ENV BITCOIN_URL https://bitcoincore.org/bin/bitcoin-core-$BITCOIN_VERSION/$BITCOIN_TARBALL
 ENV BITCOIN_ASC_URL https://bitcoincore.org/bin/bitcoin-core-$BITCOIN_VERSION/SHA256SUMS.asc
@@ -89,7 +89,7 @@ COPY ./bin /usr/local/bin
 
 VOLUME "/var/lib/lightningd"
 
-ENV LIGHTNING_VERSION=0.8.0
+ENV LIGHTNING_VERSION=0.9.1
 ENV LIGHTNING_DATA=/var/lib/lightningd
 
 RUN groupadd -r lightning && useradd -r -m -g lightning lightning \
