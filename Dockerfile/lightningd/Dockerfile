@@ -85,7 +85,7 @@ RUN apt-get update -y \
 
 COPY --from=builder /lightning/ /usr/local/
 COPY --from=downloader /opt/bitcoin/bin/bitcoin-cli /usr/bin
-COPY ./bin /usr/local/bin
+COPY bin /usr/local/bin
 
 VOLUME "/var/lib/lightningd"
 

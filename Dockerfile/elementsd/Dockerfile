@@ -70,7 +70,7 @@ RUN apt-get update -y \
 
 COPY --from=builder /elements/bin /usr/local/bin
 
-COPY ./bin /usr/local/bin
+COPY bin /usr/local/bin
 
 VOLUME "/var/lib/elementsd"
 

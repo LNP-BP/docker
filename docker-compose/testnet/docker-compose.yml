@@ -2,7 +2,7 @@ version: '3.2'
 services:
   bitcoind-testnet:
     container_name: bitcoind-testnet
-    build: ../bitcoind
+    build: ../../Dockerfile/bitcoind
     restart: unless-stopped
     command:
       - "-rpcuser=bitcoin -rpcpassword=bitcoin"
@@ -18,7 +18,7 @@ services:
 
   electrs-testnet:
     container_name: electrs-testnet
-    build: ../electrs
+    build: ../../Dockerfile/electrs
     restart: unless-stopped
     depends_on:
       - bitcoind-testnet
@@ -48,7 +48,7 @@ services:
 
   lightningd-testnet:
     container_name: lightningd-testnet
-    build: ../lightningd
+    build: ../../Dockerfile/lightningd
     restart: unless-stopped
     depends_on:
       - bitcoind-testnet
