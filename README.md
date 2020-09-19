@@ -86,7 +86,7 @@ The most simple way of using tools is to create aliases:
 ```shell script
 alias bitcoin-cli='docker exec bitcoind-mainnet bitcoin-cli -rpcpassword=bitcoin -rpcuser=bitcoin'
 alias lightning-cli='docker exec lightningd-mainnet lightning-cli --mainnet --lightning-dir /var/lib/lightningd'
-alias liquid-cli='docker exec elementsd-liquidv1 elements-cli -chain=liquidv1 -rpcpassword=bitcoin -rpcuser=bitcoin'
+alias liquid-cli='docker exec elementsd-liquidv1 elements-cli -chain=liquidv1 -rpccookiefile=/var/lib/elementsd/liquidv1/.cookie'
 alias signet-cli='docker exec bitcoind-signet bitcoin-cli --signet -rpcpassword=bitcoin -rpcuser=bitcoin'
 alias sightning-cli='docker exec lightningd-signet lightning-cli --signet --lightning-dir /var/lib/lightningd'
 ```

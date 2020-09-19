@@ -27,7 +27,8 @@ services:
       MAINCHAIN_RPC_PASSWORD: "bitcoin"
       MAINCHAIN_RPC_HOST: "bitcoind-mainnet"
       MAINCHAIN_RPC_PORT: "8332"
-    command: -chain=liquidv1
+    command:
+      - "-rpcuser=bitcoin -rpcpassword=bitcoin -chain=liquidv1"
     ports:
       - 7041:7041 # Remove this if you do not wish for the external nodes to connect to this node
       - 7042:7042
