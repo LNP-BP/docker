@@ -91,6 +91,6 @@ RUN groupadd -r lightning && useradd -r -m -g lightning lightning \
     && chmod 700 "$LIGHTNING_DATA" \
     && chown -R lightning:lightning "$LIGHTNING_DATA"
 
-EXPOSE 39735 39835
+EXPOSE 9735 9835
 
 ENTRYPOINT ["/bin/bash", "-c", "lightningd $LIGHTNING_NETWORK_FLAG --log-level=$LIGHTNING_LOG_LEVEL --lightning-dir=$LIGHTNING_DATA --bitcoin-rpcuser=$BITCOIN_RPC_USER --bitcoin-rpcpassword=$BITCOIN_RPC_PASSWORD --bitcoin-rpcconnect=$BITCOIN_RPC_CONNECT --bitcoin-rpcport=$BITCOIN_RPC_PORT"]

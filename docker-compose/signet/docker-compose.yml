@@ -62,9 +62,9 @@ services:
       LIGHTNING_NETWORK_FLAG: "--signet"
       LIGHTNING_LOG_LEVEL: "debug"
     ports:
-      - 39735:39735
+      - 39735:9735
     expose:
-      - 39735
+      - 9735
     volumes:
       - lightning:/var/lib/lightningd
     networks:
