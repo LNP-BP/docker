@@ -38,20 +38,6 @@ docker run --rm -v $PWD:/source -v blockchain:/dest -w /source scratch cp ./bitc
 docker-compose up
 ```
 
-### Using command-line interface to bitcoind
-
-To connect and execute command for the mainnet use the pattern
-```shell script
-bitcoin-cli -rpcuser=bitcoin -rpcpassword=bitcoin -rpcport=8332 getblockchaininfo 
-```
-where `getblockchaininfo` may be replaced with any other JSON-RPC command with its arguments.
-
-For the signet, use
-```shell script
-bitcoin-cli -rpcuser=bitcoin -rpcpassword=bitcoin -rpcport=38332 getblockchaininfo 
-```
-
-
 ## Changing blockchain directory location
 
 You can use your axisting bitcoin blockchain directory by first creating docker volume pointing to it
@@ -59,7 +45,7 @@ with
 ```shell script
 docker volume create --driver local --opt o=bind --opt type=none --opt device=/var/lib/bitcoin bitcoin 
 ```
-command and then by starting docker-compose with `--env=external.env` option
+command, edit `external.env` file paths and then by starting docker-compose with `--env=external.env` option
 
 ### Editing compose file
 
@@ -78,7 +64,7 @@ so it will become, for example
 In this case you will need to copy `bitcoin.conf` file to that destination; otherwise bitcoind will run with the
 default parameters
 
-### Creating container from the command line
+## Creating container from the command line
 
 Execute the following command:
 ```shell script
@@ -92,3 +78,15 @@ docker run \
  
  You do not need to clone this git repository to execute this command, however you will need to copy `bitcoin.conf` file 
  to that destination beforehand; otherwise bitcoind will run with the default parameters
+
+
+## Using command-line tools
+
+The most simple way of using tools is to create aliases:
+```shell script
+alias bitcoin-cli='docker exec bitcoind-mainnet bitcoin-cli -rpcpassword=bitcoin -rpcuser=bitcoin'
+alias lightning-cli='docker exec lightningd-mainnet lightning-cli --mainnet --lightning-dir /var/lib/lightningd'
+alias liquid-cli='docker exec elementsd-liquidv1 elements-cli -chain=liquidv1 -rpcpassword=bitcoin -rpcuser=bitcoin'
+alias signet-cli='docker exec bitcoind-signet bitcoin-cli --signet -rpcpassword=bitcoin -rpcuser=bitcoin'
+alias sightning-cli='docker exec lightningd-signet lightning-cli --signet --lightning-dir /var/lib/lightningd'
+```

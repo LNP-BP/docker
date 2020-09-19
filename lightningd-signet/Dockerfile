@@ -35,6 +35,11 @@ RUN git clone --recursive https://github.com/ElementsProject/lightning.git $LIGH
     && cd $LIGHTNING_SRC \
     && git checkout tags/v$LIGHTNING_VERSION
 
+# Remove this patch once https://github.com/ElementsProject/lightning/pull/4068/files accepted
+RUN wget https://gist.githubusercontent.com/dr-orlovsky/0bed924ee8ca7aafd2bc94d436490909/raw/548dd6e7570c16e6340585e384ffc17c45d60bdc/clightning-signet-chainparams.diff \
+    && git apply clightning-signet-chainparams.diff
+
+
 ARG DEVELOPER=0
 RUN ./configure --prefix=$LIGHTNING_BIN --enable-static
 
@@ -45,52 +50,7 @@ RUN make install
 
 
 
-FROM debian:buster-slim as downloader
-
-RUN apt-get update -y \
-    && apt-get install -y \
-        automake \
-        autotools-dev \
-        bsdmainutils \
-        build-essential \
-        git \
-        libdb-dev \
-        libdb++-dev \
-        libboost-chrono-dev \
-        libboost-filesystem-dev \
-        libboost-system-dev \
-        libboost-test-dev \
-        libboost-thread-dev \
-        libevent-dev \
-        libminiupnpc-dev \
-        libssl-dev \
-        libtool \
-        libzmq3-dev \
-        pkg-config \
-        python3 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-ENV BITCOIN_SRC=/usr/local/src/bitcoin
-ENV BITCOIN_BIN=/bitcoin
-
-RUN git clone https://github.com/kallewoof/bitcoin.git --branch 2003-signet-consensus $BITCOIN_SRC
-
-WORKDIR $BITCOIN_SRC
-
-RUN ./autogen.sh
-
-RUN mkdir $BITCOIN_BIN
-
-RUN  ./configure --with-incompatible-bdb --disable-tests --disable-bench --without-gui --prefix=$BITCOIN_BIN
-
-RUN V=1 make clean
-
-RUN V=1 make -j4
-
-RUN make install
-
-
+FROM lnpbp/bitcoind:signet as downloader
 
 FROM debian:buster-slim
 
@@ -120,12 +80,10 @@ RUN apt-get update -y \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 COPY --from=builder /lightning/ /usr/local/
-COPY --from=downloader /bitcoin/bin/bitcoin-cli /usr/local/bin/
-COPY ./bin /usr/local/bin
+COPY --from=downloader /usr/local/bin/bitcoin-cli /usr/local/bin/
 
 VOLUME "/var/lib/lightningd"
 
-ENV LIGHTNING_VERSION=0.9.1
 ENV LIGHTNING_DATA=/var/lib/lightningd
 
 RUN groupadd -r lightning && useradd -r -m -g lightning lightning \
