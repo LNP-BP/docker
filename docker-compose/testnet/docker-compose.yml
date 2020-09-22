@@ -4,8 +4,9 @@ services:
     container_name: bitcoind-testnet
     build: ../../Dockerfile/bitcoind
     restart: unless-stopped
-    command:
-      - "-rpcuser=bitcoin -rpcpassword=bitcoin"
+    command: "-rpcuser=bitcoin -rpcpassword=bitcoin -testnet \
+              -rpcbind=0.0.0.0 -rpcallowip=172.16.0.0/12 \
+              -rpcallowip=192.168.0.0/16 -rpcallowip=10.0.0.0/8"
     ports:
       - 18332:18332 # Remove this if you do not wish for the external nodes to connect to this node
       - 18333:18333
@@ -25,7 +26,7 @@ services:
     environment:
       ELECTRS_NETWORK: "testnet"
       ELECTRS_DAEMON_RPC_ADDR: "bitcoind-testnet:18332"
-      ELECTRS_ELECTRUM_RPC_ADDR: "electrs-testnet:60001"
+      ELECTRS_ELECTRUM_RPC_ADDR: "0.0.0.0:60001"
       ELECTRS_MONITORING_ADDR: "electrs-testnet:14223"
     ports:
       - 60001:60001
@@ -57,7 +58,7 @@ services:
       BITCOIN_RPC_PASSWORD: "bitcoin"
       BITCOIN_RPC_CONNECT: "bitcoind-testnet"
       BITCOIN_RPC_PORT: "18332"
-      LIGHTNING_NETWORK_FLAG: "--testnet"
+      LIGHTNING_NETWORK_FLAG: "--network=testnet"
       LIGHTNING_LOG_LEVEL: "debug"
     ports:
       - 9735:9735
