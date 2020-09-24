@@ -2,7 +2,7 @@ version: '3.2'
 services:
   bitcoind-signet:
     container_name: bitcoind-signet
-    image: lnpbp/bitcoind:signet
+    image: lnpbp/bitcoind:nightly
     restart: unless-stopped
     command:
       - "-signet"
@@ -17,7 +17,6 @@ services:
       - 38333:38333
     expose:
       - 38332
-      - 38333
     volumes:
       - bitcoin:/var/lib/bitcoin
     networks:
@@ -35,9 +34,8 @@ services:
       ELECTRS_MONITORING_ADDR: "electrs-signet:34224"
     ports:
       - 60601:60601
-      - 34224:34224
     expose:
-      - 60601
+      - 34224
     volumes:
       - type: volume
         source: bitcoin
@@ -69,8 +67,6 @@ services:
       LIGHTNING_LOG_LEVEL: "debug"
     ports:
       - 39735:9735
-    expose:
-      - 9735
     volumes:
       - lightning:/var/lib/lightningd
     networks:
@@ -78,11 +74,11 @@ services:
 
 volumes:
   bitcoin:
-      external: "${BITCOIN_VOLUME_EXTERNAL:-false}"
+    external: "${BITCOIN_VOLUME_EXTERNAL:-false}"
   electrs:
-      external: "${ELECTRS_VOLUME_EXTERNAL:-false}"
+    external: "${ELECTRS_VOLUME_EXTERNAL:-false}"
   lightning:
-      external: "${LIGHTNING_VOLUME_EXTERNAL:-false}"
+    external: "${LIGHTNING_VOLUME_EXTERNAL:-false}"
 
 networks:
   bitcoinrpc:

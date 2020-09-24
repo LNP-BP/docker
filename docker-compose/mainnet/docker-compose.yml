@@ -5,14 +5,19 @@ services:
     image: lnpbp/bitcoind:latest
     restart: unless-stopped
     command:
-      - "-rpcuser=bitcoin -rpcpassword=bitcoin"
+      - "-txindex"
+      - "-rpcbind=0.0.0.0"
+      - "-rpcallowip=10.0.0.0/8"
+      - "-rpcallowip=172.16.0.0/12"
+      - "-rpcallowip=192.168.0.0/16"
+      - "-rpcuser=bitcoin"
+      - "-rpcpassword=bitcoin"
     ports:
-      - 8332:8332 # Remove this if you do not wish for the external nodes to connect to this node
       - 8333:8333
     expose:
       - 8332
     volumes:
-      - bitcoin:/var/lib/bitcoind
+      - bitcoin:/var/lib/bitcoin
     networks:
       - bitcoinrpc
 
@@ -30,7 +35,6 @@ services:
     command:
       - "-rpcuser=bitcoin -rpcpassword=bitcoin -chain=liquidv1"
     ports:
-      - 7041:7041 # Remove this if you do not wish for the external nodes to connect to this node
       - 7042:7042
     expose:
       - 7041
@@ -49,9 +53,10 @@ services:
       ELECTRS_DAEMON_RPC_ADDR: "bitcoind-mainnet:8332"
       ELECTRS_ELECTRUM_RPC_ADDR: "electrs-mainnet:50001"
       ELECTRS_MONITORING_ADDR: "electrs-mainnet:4224"
+    expose:
+      - 4224
     ports:
       - 50001:50001
-      - 4224:4224
     volumes:
       - type: volume
         source: bitcoin
@@ -92,13 +97,13 @@ services:
 
 volumes:
   bitcoin:
-      external: "${BITCOIN_VOLUME_EXTERNAL:-false}"
+    external: "${BITCOIN_VOLUME_EXTERNAL:-false}"
   elements:
-      external: "${ELEMENTS_VOLUME_EXTERNAL:-false}"
+    external: "${ELEMENTS_VOLUME_EXTERNAL:-false}"
   electrs:
-      external: "${ELECTRS_VOLUME_EXTERNAL:-false}"
+    external: "${ELECTRS_VOLUME_EXTERNAL:-false}"
   lightning:
-      external: "${LIGHTNING_VOLUME_EXTERNAL:-false}"
+    external: "${LIGHTNING_VOLUME_EXTERNAL:-false}"
 
 networks:
   bitcoinrpc:

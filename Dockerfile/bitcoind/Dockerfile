@@ -1,4 +1,16 @@
+ARG BUILDER_DIR=/bitcoin
+ARG DISABLE_WALLET
+
+
 FROM debian:buster-slim as builder
+
+ARG SRC_DIR=/usr/local/src/bitcoin
+ARG BUILDER_DIR
+ARG VERSION
+ARG DISABLE_WALLET
+
+RUN echo ${DISABLE_WALLET+no wallet}
+RUN echo ${NO_WALLET-with wallet}
 
 RUN apt-get update -y \
     && apt-get install -y \
@@ -7,6 +19,8 @@ RUN apt-get update -y \
         bsdmainutils \
         build-essential \
         git \
+        ${DISABLE_WALLET-libdb-dev} \
+        ${DISABLE_WALLET-libdb++-dev} \
         libboost-chrono-dev \
         libboost-filesystem-dev \
         libboost-system-dev \
@@ -22,34 +36,45 @@ RUN apt-get update -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ENV BITCOIN_VERSION=0.20.1
-ENV BITCOIN_SRC=/usr/local/src/bitcoin
-ENV BITCOIN_BIN=/bitcoin
+# We are using LNP/BP-maintained version of Bitcoin Core, which follows/rebases
+# original master with only two commits on top, reverting politically-"correct"
+# changes regarding "blacklist" matters (and any other future politically or
+# censorship-motivated decisions)
+RUN git clone -n https://github.com/LNP-BP/bitcoin.git $SRC_DIR \
+    && cd $SRC_DIR \
+    && git checkout ${VERSION:+tags/v}${VERSION:-master}
 
-RUN git clone -n https://github.com/bitcoin/bitcoin.git $BITCOIN_SRC \
-    && cd $BITCOIN_SRC \
-    && git checkout tags/v$BITCOIN_VERSION
-
-WORKDIR $BITCOIN_SRC
+WORKDIR $SRC_DIR
 
 RUN ./autogen.sh
 
-RUN mkdir $BITCOIN_BIN
+RUN mkdir $BUILDER_DIR
 
-RUN  ./configure --disable-tests --disable-bench --disable-wallet --without-gui --prefix=$BITCOIN_BIN
+RUN  ./configure \
+    ${DISABLE_WALLET---with-incompatible-bdb} \
+    ${DISABLE_WALLET+--disable-wallet} \
+    --disable-tests \
+    --disable-bench \
+    --without-gui \
+    --prefix=$BUILDER_DIR
 
 RUN V=1 make clean
 
-RUN V=1 make -j4
+RUN V=1 make -j2
 
 RUN make install
 
 
 
-
 FROM debian:buster-slim
 
-LABEL maintainer.0="Dr Maxim Orlovsky <orlovsky@pandoracore.com>"
+LABEL maintainer.0="LNP/BP Standards Association <https://lnp-bp.org>"
+LABEL maintainer.1="Dr Maxim Orlovsky <orlovsky@lnp-bp.org>"
+
+ARG BUILDER_DIR
+ARG BIN_DIR=/usr/local/bin
+ARG DATA_DIR=/var/lib/bitcoin
+ARG DISABLE_WALLET
 
 RUN apt-get update -y \
     && apt-get install -y \
@@ -63,21 +88,24 @@ RUN apt-get update -y \
         libminiupnpc17 \
         libssl1.1 \
         libzmq5 \
+        ${DISABLE_WALLET-libdb5.3++} \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-COPY --from=builder /bitcoin/bin /usr/local/bin
-
-VOLUME "/var/lib/bitcoind"
-
-ENV BITCOIN_VERSION=0.20.1
-ENV BITCOIN_DATA=/var/lib/bitcoind
+COPY --from=builder $BUILDER_DIR/bin $BIN_DIR
 
 RUN groupadd -r bitcoin && useradd -r -m -g bitcoin bitcoin \
-    && mkdir -p "$BITCOIN_DATA" \
-    && chmod 700 "$BITCOIN_DATA" \
-    && chown -R bitcoin:bitcoin "$BITCOIN_DATA"
+    && mkdir -p "$DATA_DIR" \
+    && chmod 700 "$DATA_DIR" \
+    && chown -R bitcoin:bitcoin "$DATA_DIR"
 
 EXPOSE 8332 8333 18332 18333 18443 18444
 
-ENTRYPOINT ["bitcoind", "-txindex", "-datadir=/var/lib/bitcoind"]
+VOLUME $DATA_DIR
+
+USER bitcoin:bitcoin
+
+# We can't use in exec-style entrypoint any ARG or ENV variables, and we can't
+# use neither "bash -c" nor shell style since we need to maintain the ability to
+# provide additional command-line args (like `-testnet`) through docker-compose
+ENTRYPOINT ["bitcoind", "-datadir=/var/lib/bitcoin"]
