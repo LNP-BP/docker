@@ -1,4 +1,11 @@
-FROM rust:1.44.1-slim-buster as builder
+ARG VERSION
+ARG RUSTC=1.44.1
+
+
+FROM rust:${RUSTC}-slim-buster as builder
+
+ARG SRC_DIR=/usr/local/src/electrs
+ARG VERSION
 
 RUN apt-get update -y \
     && apt-get install -y \
@@ -9,15 +16,11 @@ RUN apt-get update -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ENV ELECTRS_VERSION=0.8.5
-ENV ELECTRS_SRC=/usr/local/src/electrs
-ENV ELECTRS_BIN=/usr/local/bin
+WORKDIR $SRC_DIR
 
-RUN git clone -n https://github.com/romanz/electrs.git $ELECTRS_SRC \
-    && cd $ELECTRS_SRC \
-    && git checkout tags/v$ELECTRS_VERSION
-
-WORKDIR $ELECTRS_SRC
+RUN git clone -n https://github.com/romanz/electrs.git $SRC_DIR \
+    && cd $SRC_DIR \
+    && git checkout ${VERSION:+tags/v}${VERSION:-master}
 
 RUN cargo install --path .
 
@@ -25,7 +28,9 @@ RUN cargo install --path .
 
 FROM debian:buster-slim
 
-LABEL maintainer.0="Dr Maxim Orlovsky <orlovsky@pandoracore.com>"
+LABEL maintainer.0="LNP/BP Standards Association <https://lnp-bp.org>"
+LABEL maintainer.1="Dr Maxim Orlovsky <orlovsky@lnp-bp.org>"
+LABEL maintainer.2="Zoe Faltiba"
 
 RUN apt-get update -y \
     && apt-get install -y \
@@ -33,33 +38,31 @@ RUN apt-get update -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-COPY --from=builder /usr/local/cargo/bin/electrs /usr/local/bin
+ARG BIN_DIR=/usr/local/bin
+ARG BITCOIN_DIR=/var/lib/bitcoin
+ARG DATA_DIR=/var/lib/electrs
 
-ENV BITCOIN_DATA=/var/lib/bitcoind
-ENV ELECTRS_DATA=/var/lib/electrs
-ENV ELECTRS_CONF=/etc/electrs/config.toml
+COPY --from=builder /usr/local/cargo/bin/electrs $BIN_DIR
 
-RUN mkdir /etc/electrs
-RUN echo 'cookie = "bitcoin:bitcoin"' > $ELECTRS_CONF
+RUN mkdir /etc/electrs \
+    && echo 'cookie = "bitcoin:bitcoin"' > /etc/electrs/config.toml
 
 RUN groupadd -r electrs && useradd -r -m -g electrs electrs \
-    && mkdir -p "$ELECTRS_DATA" \
-    && chmod 700 "$ELECTRS_DATA" \
-    && chown -R electrs:electrs "$ELECTRS_DATA"
-
-VOLUME "/var/lib/bitcoind"
-VOLUME "/var/lib/electrs"
+    && mkdir -p "$DATA_DIR" \
+    && chmod 700 "$DATA_DIR" \
+    && chown -R electrs:electrs "$DATA_DIR"
 
 # Electrum RPC: mainnet, testnet and signet
-EXPOSE 50001
-EXPOSE 60001
-EXPOSE 60002
+EXPOSE 50001 60001 60601
 
-# Prometheus monitoring: mainnet, testnet and signet
+# Prometheus monitoring
 EXPOSE 4224
-EXPOSE 4223
-EXPOSE 4222
+
+VOLUME $BITCOIN_DIR
+VOLUME $DATA_DIR
+
+USER electrs:electrs
 
 STOPSIGNAL SIGINT
 
-ENTRYPOINT ["/bin/bash", "-c", "/usr/local/bin/electrs -vvvv --daemon-dir $BITCOIN_DATA --db-dir $ELECTRS_DATA"]
+ENTRYPOINT ["/usr/local/bin/electrs", "--daemon-dir /var/lib/bitcoin", "--db-dir /var/lib/electrs"]

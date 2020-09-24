@@ -31,27 +31,36 @@ options edit `command` and `env` sections in a used `docker-compose.yml` file
 
 The most simple way of using tools is to create aliases:
 ```shell script
-alias bitcoin-cli='docker exec bitcoind-mainnet bitcoin-cli -rpcpassword=bitcoin -rpcuser=bitcoin'
-alias lightning-cli='docker exec lightningd-mainnet lightning-cli --mainnet --lightning-dir /var/lib/lightningd'
-alias liquid-cli='docker exec elementsd-liquidv1 elements-cli -chain=liquidv1 -rpccookiefile=/var/lib/elementsd/liquidv1/.cookie'
-alias signet-cli='docker exec bitcoind-signet bitcoin-cli --signet -rpcpassword=bitcoin -rpcuser=bitcoin'
-alias sightning-cli='docker exec lightningd-signet lightning-cli --signet --lightning-dir /var/lib/lightningd'
+alias bitcoin-cli='docker exec bitcoind-mainnet bitcoin-cli --datadir=/var/lib/bitcoin -rpcpassword=bitcoin -rpcuser=bitcoin'
+alias lightning-cli='docker exec lightningd-mainnet lightning-cli --lightning-dir=/var/lib/lightning --mainnet --lightning-dir /var/lib/lightning'
+alias liquid-cli='docker exec elementsd-liquidv1 elements-cli --datadir=/var/lib/elements -chain=liquidv1 -rpcuser=bitcoin -rpcpassword=bitcoin'
+alias signet-cli='docker exec bitcoind-signet bitcoin-cli --datadir=/var/lib/bitcoin --signet -rpcpassword=bitcoin -rpcuser=bitcoin'
+alias sightning-cli='docker exec lightningd-signet lightning-cli --lightning-dir=/var/lib/lightning --signet --lightning-dir /var/lib/lightning'
 ```
 
 ### Customizing docker images
 
 #### Default build commands
 
-- Bitcoin Core
+- **Bitcoin Core**: we disable wallet in the release build, but leaving it for
+  nightly builds such it will be possible to play with signet & testnet
+  transactions.
     - latest & version tagged:
       `docker build Dockerfile/bitcoind --build-arg VERSION=<version> --build-arg DISABLE_WALLET=`
     - nightly build:
       `docker build Dockerfile/bitcoind`
-- c-Lightning:
+- **c-Lightning**: nightly version has developer features enabled and is built
+  with bitcoin-cli coming from the nightly Bitcoin Core build
     - latest & version tagged:
       `docker build Dockerfile/lightningd --build-arg VERSION=<version>`
     - nightly build:
       `docker build Dockerfile/lightningd --build-arg BITCOIN_VERSION=nightly --build-arg DEVELOPER=true`
+- **Elements**: since there is not a lot of liquid-enabled wallets, here we
+  enable wallet in all builds
+    - latest & version tagged:
+      `docker build Dockerfile/elementsd --build-arg VERSION=<version>`
+    - nightly build:
+      `docker build Dockerfile/elementsd`
 
 #### Bitcoin Core
 
@@ -63,12 +72,10 @@ following:
   master (=nightly build)
 - you need to set `DISABLE_WALLET` arg to an empty string if you'd like 
   the build to include wallet functionality:
-  ```shell script
-  docker build .
-         --build-arg DISABLE_WALLET=
-  ```
-  If this argument is not provided bitcoin core is build with ~~~~a new BerkleyDB
-  backed wallet.
+  `docker build . --build-arg DISABLE_WALLET=`
+  If this argument is not provided bitcoin core is built with wallet backed
+  by the new (5th) version of BerkleyDB storage, meaning that old Bitcoin Core
+  wallets can't be imported.
 
 
 ### Changing blockchain directory location
@@ -80,9 +87,24 @@ You can use your existing bitcoin blockchain directory using the following steps
                          --opt o=bind \
                          --opt type=none \
                          --opt device=/var/lib/bitcoin \
-                         bitcoin 
+                         bitcoin
+    docker volume create --driver local \
+                         --opt o=bind \
+                         --opt type=none \
+                         --opt device=/var/lib/lightning \
+                         lightning 
+    docker volume create --driver local \
+                         --opt o=bind \
+                         --opt type=none \
+                         --opt device=/var/lib/elements \
+                         elements 
+    docker volume create --driver local \
+                         --opt o=bind \
+                         --opt type=none \
+                         --opt device=/var/lib/electrs \
+                         electrs 
     ```
-   where `/var/lib/bitcoin` must be replaced with your destination directory
+   where `/var/lib/bitcoin` etc must be replaced with your destination directories
 2. Edit `docker-compose/.env` file paths
 3. When starting docker-compose from within an appropriate `docker-compose.yml` 
    file directory provide it with `-env=../.env` option
