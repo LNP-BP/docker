@@ -36,6 +36,8 @@ RUN apt-get update -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+WORKDIR $SRC_DIR
+
 # We are using LNP/BP-maintained version of Bitcoin Core, which follows/rebases
 # original master with only two commits on top, reverting politically-"correct"
 # changes regarding "blacklist" matters (and any other future politically or
@@ -43,8 +45,6 @@ RUN apt-get update -y \
 RUN git clone -n https://github.com/LNP-BP/bitcoin.git $SRC_DIR \
     && cd $SRC_DIR \
     && git checkout ${VERSION:+tags/v}${VERSION:-master}
-
-WORKDIR $SRC_DIR
 
 RUN ./autogen.sh
 
@@ -70,6 +70,7 @@ FROM debian:buster-slim
 
 LABEL maintainer.0="LNP/BP Standards Association <https://lnp-bp.org>"
 LABEL maintainer.1="Dr Maxim Orlovsky <orlovsky@lnp-bp.org>"
+LABEL maintainer.2="Zoe Faltiba"
 
 ARG BUILDER_DIR
 ARG BIN_DIR=/usr/local/bin

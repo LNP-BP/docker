@@ -55,19 +55,18 @@ services:
 
   lightningd-testnet:
     container_name: lightningd-testnet
-    image: lnpbp/lightningd:latest
+    image: lnpbp/lightningd:nightly
     restart: unless-stopped
     depends_on:
       - bitcoind-testnet
     environment:
-      BITCOIN_RPC_USER: "bitcoin"
-      BITCOIN_RPC_PASSWORD: "bitcoin"
-      BITCOIN_RPC_CONNECT: "bitcoind-testnet"
-      BITCOIN_RPC_PORT: "18332"
-      LIGHTNING_NETWORK_FLAG: "--network=testnet"
-      LIGHTNING_LOG_LEVEL: "debug"
+      - "--testnet"
+      - "--log-level=debug"
+      - "--bitcoin-rpcuser=bitcoin"
+      - "--bitcoin-rpcpassword=bitcoin"
+      - "--bitcoin-rpcconnect=bitcoind-testnet"
     ports:
-      - 9735:9735
+      - 19735:9735
     volumes:
       - lightning:/var/lib/lightning
     networks:

@@ -1,4 +1,15 @@
+ARG BUILDER_DIR=/lightning
+ARG VERSION
+ARG DEVELOPER
+ARG BITCOIN_VERSION=latest
+
+
 FROM debian:buster-slim as builder
+
+ARG SRC_DIR=/usr/local/src/lightning
+ARG BUILDER_DIR
+ARG VERSION
+ARG DEVELOPER
 
 RUN apt-get update -y \
     && apt-get install -y --no-install-recommends \
@@ -23,80 +34,62 @@ RUN apt-get update -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ENV LIGHTNING_VERSION=0.9.1
-ENV LIGHTNING_SRC=/usr/local/src/lightning
-ENV LIGHTNING_BIN=/lightning
+WORKDIR $SRC_DIR
 
-WORKDIR $LIGHTNING_SRC
+RUN git clone --recursive https://github.com/ElementsProject/lightning.git $SRC_DIR \
+    && cd $SRC_DIR \
+    && git checkout ${VERSION:+tags/v}${VERSION:-master}
 
-RUN mkdir $LIGHTNING_BIN
+RUN mkdir $BUILDER_DIR
 
-RUN git clone --recursive https://github.com/ElementsProject/lightning.git $LIGHTNING_SRC \
-    && cd $LIGHTNING_SRC \
-    && git checkout tags/v$LIGHTNING_VERSION
+RUN ./configure \
+    --prefix=$BUILDER_DIR \
+    ${DEVELOPER+--enable-developer} \
+    --enable-static
 
-ARG DEVELOPER=0
-RUN ./configure --prefix=$LIGHTNING_BIN --enable-static
+RUN V=1 make clean
 
-RUN make -j3 DEVELOPER=${DEVELOPER}
+RUN V=1 make -j3
 
 RUN make install
 
 
-
-
-FROM debian:buster-slim as downloader
-
-RUN apt-get update -y \
-    && apt-get install -y --no-install-recommends \
-        ca-certificates \
-        dirmngr \
-        wget \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-ARG BITCOIN_VERSION=0.20.1
-ENV BITCOIN_TARBALL bitcoin-${BITCOIN_VERSION}-x86_64-linux-gnu.tar.gz
-ENV BITCOIN_URL https://bitcoincore.org/bin/bitcoin-core-$BITCOIN_VERSION/$BITCOIN_TARBALL
-ENV BITCOIN_ASC_URL https://bitcoincore.org/bin/bitcoin-core-$BITCOIN_VERSION/SHA256SUMS.asc
-
-RUN mkdir /opt/bitcoin && cd /opt/bitcoin \
-    && wget -qO $BITCOIN_TARBALL "$BITCOIN_URL" \
-    && wget -qO bitcoin.asc "$BITCOIN_ASC_URL" \
-    && grep $BITCOIN_TARBALL bitcoin.asc | tee SHA256SUMS.asc \
-    && sha256sum -c SHA256SUMS.asc \
-    && BD=bitcoin-$BITCOIN_VERSION/bin \
-    && tar -xzvf $BITCOIN_TARBALL $BD/bitcoin-cli --strip-components=1 \
-    && rm $BITCOIN_TARBALL
-
-
-
-
+FROM lnpbp/bitcoind:${BITCOIN_VERSION} as downloader
 FROM debian:buster-slim
 
-LABEL maintainer.0="Dr Maxim Orlovsky <orlovsky@pandoracore.com>"
+LABEL maintainer.0="LNP/BP Standards Association <https://lnp-bp.org>"
+LABEL maintainer.1="Dr Maxim Orlovsky <orlovsky@lnp-bp.org>"
+LABEL maintainer.2="Zoe Faltiba"
+
+ARG BUILDER_DIR
+ARG DEST_DIR=/usr/local
+ARG DATA_DIR=/var/lib/lightning
 
 RUN apt-get update -y \
     && apt-get install -y --no-install-recommends \
+        libboost-chrono1.67.0 \
+        libboost-filesystem1.67.0 \
+        libboost-system1.67.0 \
+        libboost-thread1.67.0 \
+        libevent-2.1-6 \
+        libevent-pthreads-2.1-6 \
         socat \
         inotify-tools \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-COPY --from=builder /lightning/ /usr/local/
-COPY --from=downloader /opt/bitcoin/bin/bitcoin-cli /usr/bin
-COPY bin /usr/local/bin
-
-VOLUME "/var/lib/lightningd"
-
-ENV LIGHTNING_VERSION=0.9.1
-ENV LIGHTNING_DATA=/var/lib/lightningd
+COPY --from=builder $BUILDER_DIR/ $DEST_DIR/
+COPY --from=downloader $DEST_DIR/bin/bitcoin-cli $DEST_DIR/bin/
 
 RUN groupadd -r lightning && useradd -r -m -g lightning lightning \
-    && mkdir -p "$LIGHTNING_DATA" \
-    && chmod 700 "$LIGHTNING_DATA" \
-    && chown -R lightning:lightning "$LIGHTNING_DATA"
+    && mkdir -p "$DATA_DIR" \
+    && chmod 700 "$DATA_DIR" \
+    && chown -R lightning:lightning "$DATA_DIR"
 
 EXPOSE 9735 9835
 
-ENTRYPOINT ["/bin/bash", "-c", "lightningd $LIGHTNING_NETWORK_FLAG --log-level=$LIGHTNING_LOG_LEVEL --lightning-dir=$LIGHTNING_DATA --bitcoin-rpcuser=$BITCOIN_RPC_USER --bitcoin-rpcpassword=$BITCOIN_RPC_PASSWORD --bitcoin-rpcconnect=$BITCOIN_RPC_CONNECT --bitcoin-rpcport=$BITCOIN_RPC_PORT"]
+VOLUME $DATA_DIR
+
+USER lightning:lightning
+
+ENTRYPOINT ["lightningd", "--lightning-dir=/var/lib/lightning"]
