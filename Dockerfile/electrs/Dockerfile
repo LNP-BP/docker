@@ -35,9 +35,9 @@ RUN apt-get update -y \
 
 COPY --from=builder /usr/local/cargo/bin/electrs /usr/local/bin
 
-ENV BITCOIN_DATA=/var/lib/bitcoin
+ENV BITCOIN_DATA=/var/lib/bitcoind
 ENV ELECTRS_DATA=/var/lib/electrs
-ENV ELECTRS_CONF=/etc/electrs/electrs.toml
+ENV ELECTRS_CONF=/etc/electrs/config.toml
 
 RUN mkdir /etc/electrs
 RUN echo 'cookie = "bitcoin:bitcoin"' > $ELECTRS_CONF
@@ -47,7 +47,7 @@ RUN groupadd -r electrs && useradd -r -m -g electrs electrs \
     && chmod 700 "$ELECTRS_DATA" \
     && chown -R electrs:electrs "$ELECTRS_DATA"
 
-VOLUME "/var/lib/bitcoin"
+VOLUME "/var/lib/bitcoind"
 VOLUME "/var/lib/electrs"
 
 # Electrum RPC: mainnet, testnet and signet
@@ -62,4 +62,4 @@ EXPOSE 4222
 
 STOPSIGNAL SIGINT
 
-ENTRYPOINT ["/bin/bash", "-c", "/usr/local/bin/electrs -vvvv --daemon-dir $BITCOIN_DATA --db-dir $ELECTRS_DATA --conf $ELECTRS_CONF "]
+ENTRYPOINT ["/bin/bash", "-c", "/usr/local/bin/electrs -vvvv --daemon-dir $BITCOIN_DATA --db-dir $ELECTRS_DATA"]

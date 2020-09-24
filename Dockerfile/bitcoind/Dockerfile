@@ -80,4 +80,4 @@ RUN groupadd -r bitcoin && useradd -r -m -g bitcoin bitcoin \
 
 EXPOSE 8332 8333 18332 18333 18443 18444
 
-ENTRYPOINT ["/bin/bash", "-c", "bitcoind -txindex -datadir=$BITCOIN_DATA"]
+ENTRYPOINT ["bitcoind", "-txindex", "-datadir=/var/lib/bitcoind"]
