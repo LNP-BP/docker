@@ -61,6 +61,11 @@ alias sightning-cli='docker exec lightningd-signet lightning-cli --lightning-dir
       `docker build Dockerfile/elementsd --build-arg VERSION=<version>`
     - nightly build:
       `docker build Dockerfile/elementsd`
+- **Electrs**:
+    - latest & version tagged:
+      `docker build Dockerfile/electrs --build-arg VERSION=<version>`
+    - nightly build:
+      `docker build Dockerfile/electrs`
 
 #### Bitcoin Core
 

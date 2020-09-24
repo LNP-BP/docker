@@ -28,9 +28,9 @@ RUN cargo install --path .
 
 FROM debian:buster-slim
 
-LABEL maintainer.0="LNP/BP Standards Association <https://lnp-bp.org>"
-LABEL maintainer.1="Dr Maxim Orlovsky <orlovsky@lnp-bp.org>"
-LABEL maintainer.2="Zoe Faltiba"
+LABEL maintainer.0="LNP/BP Standards Association <https://lnp-bp.org>" \
+      maintainer.1="Dr Maxim Orlovsky <orlovsky@lnp-bp.org>" \
+      maintainer.2="Zoe Faltiba"
 
 RUN apt-get update -y \
     && apt-get install -y \
@@ -66,3 +66,5 @@ USER electrs:electrs
 STOPSIGNAL SIGINT
 
 ENTRYPOINT ["electrs", "--daemon-dir /var/lib/bitcoin", "--db-dir /var/lib/electrs"]
+
+CMD ["-vvvv"]

@@ -10,6 +10,7 @@ ARG SRC_DIR=/usr/local/src/lightning
 ARG BUILDER_DIR
 ARG VERSION
 ARG DEVELOPER
+ARG BUILD_JETS=3
 
 RUN apt-get update -y \
     && apt-get install -y --no-install-recommends \
@@ -49,7 +50,7 @@ RUN ./configure \
 
 RUN V=1 make clean
 
-RUN V=1 make -j3
+RUN V=1 make -j${BUILD_JETS}
 
 RUN make install
 
@@ -57,9 +58,9 @@ RUN make install
 FROM lnpbp/bitcoind:${BITCOIN_VERSION} as downloader
 FROM debian:buster-slim
 
-LABEL maintainer.0="LNP/BP Standards Association <https://lnp-bp.org>"
-LABEL maintainer.1="Dr Maxim Orlovsky <orlovsky@lnp-bp.org>"
-LABEL maintainer.2="Zoe Faltiba"
+LABEL maintainer.0="LNP/BP Standards Association <https://lnp-bp.org>" \
+      maintainer.1="Dr Maxim Orlovsky <orlovsky@lnp-bp.org>" \
+      maintainer.2="Zoe Faltiba"
 
 ARG BUILDER_DIR
 ARG DEST_DIR=/usr/local

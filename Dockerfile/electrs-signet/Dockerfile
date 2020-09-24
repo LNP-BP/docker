@@ -24,7 +24,9 @@ RUN cargo install --path .
 
 FROM debian:buster-slim
 
-LABEL maintainer.0="Dr Maxim Orlovsky <orlovsky@pandoracore.com>"
+LABEL maintainer.0="LNP/BP Standards Association <https://lnp-bp.org>" \
+      maintainer.1="Dr Maxim Orlovsky <orlovsky@lnp-bp.org>" \
+      maintainer.2="Zoe Faltiba"
 
 RUN apt-get update -y \
     && apt-get install -y \

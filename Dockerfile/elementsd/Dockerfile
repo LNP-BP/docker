@@ -66,9 +66,9 @@ RUN make install
 
 FROM debian:buster-slim
 
-LABEL maintainer.0="LNP/BP Standards Association <https://lnp-bp.org>"
-LABEL maintainer.1="Dr Maxim Orlovsky <orlovsky@lnp-bp.org>"
-LABEL maintainer.2="Zoe Faltiba"
+LABEL maintainer.0="LNP/BP Standards Association <https://lnp-bp.org>" \
+      maintainer.1="Dr Maxim Orlovsky <orlovsky@lnp-bp.org>" \
+      maintainer.2="Zoe Faltiba"
 
 ARG BUILDER_DIR
 ARG BIN_DIR=/usr/local/bin

@@ -8,6 +8,7 @@ ARG SRC_DIR=/usr/local/src/bitcoin
 ARG BUILDER_DIR
 ARG VERSION
 ARG DISABLE_WALLET
+ARG BUILD_JETS=2
 
 RUN apt-get update -y \
     && apt-get install -y \
@@ -57,7 +58,7 @@ RUN  ./configure \
 
 RUN V=1 make clean
 
-RUN V=1 make -j2
+RUN V=1 make -j${BUILD_JETS}
 
 RUN make install
 
@@ -65,9 +66,9 @@ RUN make install
 
 FROM debian:buster-slim
 
-LABEL maintainer.0="LNP/BP Standards Association <https://lnp-bp.org>"
-LABEL maintainer.1="Dr Maxim Orlovsky <orlovsky@lnp-bp.org>"
-LABEL maintainer.2="Zoe Faltiba"
+LABEL maintainer.0="LNP/BP Standards Association <https://lnp-bp.org>" \
+      maintainer.1="Dr Maxim Orlovsky <orlovsky@lnp-bp.org>" \
+      maintainer.2="Zoe Faltiba"
 
 ARG BUILDER_DIR
 ARG BIN_DIR=/usr/local/bin
