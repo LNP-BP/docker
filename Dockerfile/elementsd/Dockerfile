@@ -8,6 +8,7 @@ ARG SRC_DIR=/usr/local/src/bitcoin
 ARG BUILDER_DIR
 ARG VERSION
 ARG DISABLE_WALLET
+ARG BUILD_JETS=2
 
 RUN apt-get update -y \
     && apt-get install -y \
@@ -57,7 +58,7 @@ RUN  ./configure \
 
 RUN V=1 make clean
 
-RUN V=1 make -j2
+RUN V=1 make -j${BUILD_JETS}
 
 RUN make install
 

@@ -65,4 +65,4 @@ USER electrs:electrs
 
 STOPSIGNAL SIGINT
 
-ENTRYPOINT ["/usr/local/bin/electrs", "--daemon-dir /var/lib/bitcoin", "--db-dir /var/lib/electrs"]
+ENTRYPOINT ["electrs", "--daemon-dir /var/lib/bitcoin", "--db-dir /var/lib/electrs"]
