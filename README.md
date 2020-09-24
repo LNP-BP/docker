@@ -40,6 +40,19 @@ alias sightning-cli='docker exec lightningd-signet lightning-cli --signet --ligh
 
 ### Customizing docker images
 
+#### Default build commands
+
+- Bitcoin Core
+    - latest & version tagged:
+      `docker build Dockerfile/bitcoind --build-arg VERSION=<version> --build-arg DISABLE_WALLET=`
+    - nightly build:
+      `docker build Dockerfile/bitcoind`
+- c-Lightning:
+    - latest & version tagged:
+      `docker build Dockerfile/lightningd --build-arg VERSION=<version>`
+    - nightly build:
+      `docker build Dockerfile/lightningd --build-arg BITCOIN_VERSION=nightly --build-arg DEVELOPER=true`
+
 #### Bitcoin Core
 
 If you are planning to create your own docker image builds, remember the 
@@ -52,7 +65,7 @@ following:
   the build to include wallet functionality:
   ```shell script
   docker build .
-   --build-arg DISABLE_WALLET=
+         --build-arg DISABLE_WALLET=
   ```
   If this argument is not provided bitcoin core is build with ~~~~a new BerkleyDB
   backed wallet.
