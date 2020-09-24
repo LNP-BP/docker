@@ -5,9 +5,15 @@ services:
     image: lnpbp/bitcoind:signet
     restart: unless-stopped
     command:
-      - "-rpcuser=bitcoin -rpcpassword=bitcoin"
+      - "-signet"
+      - "-txindex"
+      - "-rpcbind=0.0.0.0"
+      - "-rpcallowip=10.0.0.0/8"
+      - "-rpcallowip=172.16.0.0/12"
+      - "-rpcallowip=192.168.0.0/16"
+      - "-rpcuser=bitcoin"
+      - "-rpcpassword=bitcoin"
     ports:
-      - 38332:38332 # Remove this if you do not wish for the external nodes to connect to this node
       - 38333:38333
     expose:
       - 38332
