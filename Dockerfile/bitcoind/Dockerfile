@@ -9,9 +9,6 @@ ARG BUILDER_DIR
 ARG VERSION
 ARG DISABLE_WALLET
 
-RUN echo ${DISABLE_WALLET+no wallet}
-RUN echo ${NO_WALLET-with wallet}
-
 RUN apt-get update -y \
     && apt-get install -y \
         automake \
@@ -100,7 +97,7 @@ RUN groupadd -r bitcoin && useradd -r -m -g bitcoin bitcoin \
     && chmod 700 "$DATA_DIR" \
     && chown -R bitcoin:bitcoin "$DATA_DIR"
 
-EXPOSE 8332 8333 18332 18333 18443 18444
+EXPOSE 8332 8333 18332 18333 18443 18444 38332 38333
 
 VOLUME $DATA_DIR
 

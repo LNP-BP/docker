@@ -27,19 +27,25 @@ services:
     restart: unless-stopped
     depends_on:
       - bitcoind-mainnet
-    environment:
-      MAINCHAIN_RPC_USER: "bitcoin"
-      MAINCHAIN_RPC_PASSWORD: "bitcoin"
-      MAINCHAIN_RPC_HOST: "bitcoind-mainnet"
-      MAINCHAIN_RPC_PORT: "8332"
     command:
-      - "-rpcuser=bitcoin -rpcpassword=bitcoin -chain=liquidv1"
+      - "-chain=liquidv1"
+      - "-txindex"
+      - "-rpcbind=0.0.0.0"
+      - "-rpcallowip=10.0.0.0/8"
+      - "-rpcallowip=172.16.0.0/12"
+      - "-rpcallowip=192.168.0.0/16"
+      - "-rpcuser=bitcoin"
+      - "-rpcpassword=bitcoin"
+      - "-mainchainrpcuser=bitcoin"
+      - "-mainchainrpcpassword=bitcoin"
+      - "-mainchainrpchost=bitcoind-mainnet"
+      - "-mainchainrpcport=8332"
     ports:
       - 7042:7042
     expose:
       - 7041
     volumes:
-      - elements:/var/lib/elementsd
+      - elements:/var/lib/elements
     networks:
       - bitcoinrpc
 
