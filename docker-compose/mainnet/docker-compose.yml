@@ -88,8 +88,6 @@ services:
       LIGHTNING_LOG_LEVEL: "debug"
     ports:
       - 9735:9735
-    expose:
-      - 9735
     volumes:
       - lightning:/var/lib/lightningd
     networks:

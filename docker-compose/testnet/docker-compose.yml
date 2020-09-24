@@ -2,39 +2,45 @@ version: '3.2'
 services:
   bitcoind-testnet:
     container_name: bitcoind-testnet
-    build: ../../Dockerfile/bitcoind
+    image: lnpbp/bitcoind:nightly
     restart: unless-stopped
-    command: "-rpcuser=bitcoin -rpcpassword=bitcoin -testnet \
-              -rpcbind=0.0.0.0 -rpcallowip=172.16.0.0/12 \
-              -rpcallowip=192.168.0.0/16 -rpcallowip=10.0.0.0/8"
+    command:
+      - "-testnet"
+      - "-txindex"
+      - "-rpcbind=0.0.0.0"
+      - "-rpcallowip=10.0.0.0/8"
+      - "-rpcallowip=172.16.0.0/12"
+      - "-rpcallowip=192.168.0.0/16"
+      - "-rpcuser=bitcoin"
+      - "-rpcpassword=bitcoin"
     ports:
-      - 18332:18332 # Remove this if you do not wish for the external nodes to connect to this node
       - 18333:18333
     expose:
       - 18332
     volumes:
-      - bitcoin:/var/lib/bitcoind
+      - bitcoin:/var/lib/bitcoin
     networks:
       - bitcoinrpc
 
   electrs-testnet:
     container_name: electrs-testnet
-    build: ../../Dockerfile/electrs
+    image: lnpbp/electrs:latest
     restart: unless-stopped
     depends_on:
       - bitcoind-testnet
     environment:
       ELECTRS_NETWORK: "testnet"
       ELECTRS_DAEMON_RPC_ADDR: "bitcoind-testnet:18332"
-      ELECTRS_ELECTRUM_RPC_ADDR: "0.0.0.0:60001"
+      ELECTRS_ELECTRUM_RPC_ADDR: "electrs-testnet:60001"
       ELECTRS_MONITORING_ADDR: "electrs-testnet:14223"
     ports:
       - 60001:60001
-      - 4223:4223
+    expose:
+      - 4223
     volumes:
       - type: volume
         source: bitcoin
-        target: /var/lib/bitcoind
+        target: /var/lib/bitcoin
         read_only: true
         volume:
           nocopy: true
@@ -49,7 +55,7 @@ services:
 
   lightningd-testnet:
     container_name: lightningd-testnet
-    build: ../../Dockerfile/lightningd
+    image: lnpbp/lightningd:latest
     restart: unless-stopped
     depends_on:
       - bitcoind-testnet
@@ -62,8 +68,6 @@ services:
       LIGHTNING_LOG_LEVEL: "debug"
     ports:
       - 9735:9735
-    expose:
-      - 9735
     volumes:
       - lightning:/var/lib/lightning
     networks:
