@@ -2,16 +2,21 @@ version: '3.2'
 services:
   bitcoind-signet:
     container_name: bitcoind-signet
-    image: lnpbp/bitcoind:signet
+    image: lnpbp/bitcoind:nightly
     restart: unless-stopped
     command:
-      - "-rpcuser=bitcoin -rpcpassword=bitcoin"
+      - "-signet"
+      - "-txindex"
+      - "-rpcbind=0.0.0.0"
+      - "-rpcallowip=10.0.0.0/8"
+      - "-rpcallowip=172.16.0.0/12"
+      - "-rpcallowip=192.168.0.0/16"
+      - "-rpcuser=bitcoin"
+      - "-rpcpassword=bitcoin"
     ports:
-      - 38332:38332 # Remove this if you do not wish for the external nodes to connect to this node
       - 38333:38333
     expose:
       - 38332
-      - 38333
     volumes:
       - bitcoin:/var/lib/bitcoin
     networks:
@@ -29,9 +34,8 @@ services:
       ELECTRS_MONITORING_ADDR: "electrs-signet:34224"
     ports:
       - 60601:60601
-      - 34224:34224
     expose:
-      - 60601
+      - 34224
     volumes:
       - type: volume
         source: bitcoin
@@ -50,33 +54,30 @@ services:
 
   lightningd-signet:
     container_name: lightningd-signet
-    image: lnpbp/lightningd:signet
+    image: lnpbp/lightningd:nightly
     restart: unless-stopped
     depends_on:
       - bitcoind-signet
-    environment:
-      BITCOIN_RPC_USER: "bitcoin"
-      BITCOIN_RPC_PASSWORD: "bitcoin"
-      BITCOIN_RPC_CONNECT: "bitcoind-signet"
-      BITCOIN_RPC_PORT: "38332"
-      LIGHTNING_NETWORK_FLAG: "--signet"
-      LIGHTNING_LOG_LEVEL: "debug"
+    command:
+      - "--signet"
+      - "--log-level=debug"
+      - "--bitcoin-rpcuser=bitcoin"
+      - "--bitcoin-rpcpassword=bitcoin"
+      - "--bitcoin-rpcconnect=bitcoind-signet"
     ports:
       - 39735:9735
-    expose:
-      - 9735
     volumes:
-      - lightning:/var/lib/lightningd
+      - lightning:/var/lib/lightning
     networks:
       - bitcoinrpc
 
 volumes:
   bitcoin:
-      external: "${BITCOIN_VOLUME_EXTERNAL:-false}"
+    external: "${BITCOIN_VOLUME_EXTERNAL:-false}"
   electrs:
-      external: "${ELECTRS_VOLUME_EXTERNAL:-false}"
+    external: "${ELECTRS_VOLUME_EXTERNAL:-false}"
   lightning:
-      external: "${LIGHTNING_VOLUME_EXTERNAL:-false}"
+    external: "${LIGHTNING_VOLUME_EXTERNAL:-false}"
 
 networks:
   bitcoinrpc:

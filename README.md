@@ -3,90 +3,126 @@
 This containers are maintained by LNP/BP Standards Association
 
 - **Bitcoin Core**: <https://hub.docker.com/r/lnpbp/bitcoind>
-  Minimalistic build without wallet (but with ZMQ) on Debian Buster
-- **Bitcoin Core** for SigNet: <https://hub.docker.com/r/lnpbp/bitcoind-signet>
-  Minimalistic build of the original SigNet fork without wallet (but with ZMQ)
-  on Debian Buster
 - **c-Lightning**: <https://hub.docker.com/r/lnpbp/lightningd>
-  Standard c-lightning build
-- **Electrs**:
-  Rust implementation of the Electrum server
+- **Electrs**: <https://hub.docker.com/r/lnpbp/electrs>
+- **RGB Node**: <https://hub.docker.com/r/lnpbp/rgb-node>
+
 
 ## Quickstart
 
 1. Clone this repository and change to its dir: 
     ```shell script
-   git clone https://github.com/lnp-bp/docker
-   cd docker
+   git clone https://github.com/LNP-BP/docker
+   cd docker/docker-compose
     ```
-2. Initialize volume and default config file with this commands:
-    ```shell script
-    docker volume create blockchain
-    docker run --rm -v $PWD:/source -v blockchain:/dest -w /source scratch cp ./bitcoin.conf /dest
-    ```
-2. Go to the `mainnet`, `signet` or `liquid` directory and perform 
+2. Go to the `mainnet`, `signet` or `testnet` directory and perform 
    `docker-compose up` command
 
-Now you will have bitcoind running for mainnet and signet with JSON-RPC interface opened for the local machine.
-You will be able to access it with the user name `bitcoin` and password `bitcoin`.
+Now you will have bitcoind, lightningd, electrs and elementsd (for mainnet 
+version only) running with JSON-RPC interface opened for the local machine.
 
-To modify the default JSON-RPC user name, password, IP addresses and other bitcoind options edit the `bitcoin.conf`
-file in the root directory of the repository and each time perform this command:
+To modify the default JSON-RPC user name, password, IP addresses and other 
+options edit `command` and `env` sections in a used `docker-compose.yml` file
+
+
+## Detailed instructions
+
+### Using command-line tools
+
+The most simple way of using tools is to create aliases:
 ```shell script
-docker-compose down
-docker run --rm -v $PWD:/source -v blockchain:/dest -w /source scratch cp ./bitcoin.conf /dest
-docker-compose up
+alias bitcoin-cli='docker exec bitcoind-mainnet bitcoin-cli --datadir=/var/lib/bitcoin -rpcpassword=bitcoin -rpcuser=bitcoin'
+alias lightning-cli='docker exec lightningd-mainnet lightning-cli --lightning-dir=/var/lib/lightning --mainnet --lightning-dir /var/lib/lightning'
+alias liquid-cli='docker exec elementsd-liquidv1 elements-cli --datadir=/var/lib/elements -chain=liquidv1 -rpcuser=bitcoin -rpcpassword=bitcoin'
+alias signet-cli='docker exec bitcoind-signet bitcoin-cli --datadir=/var/lib/bitcoin --signet -rpcpassword=bitcoin -rpcuser=bitcoin'
+alias sightning-cli='docker exec lightningd-signet lightning-cli --lightning-dir=/var/lib/lightning --signet --lightning-dir /var/lib/lightning'
 ```
 
-## Changing blockchain directory location
+### Customizing docker images
 
-You can use your axisting bitcoin blockchain directory by first creating docker volume pointing to it
-with
-```shell script
-docker volume create --driver local --opt o=bind --opt type=none --opt device=/var/lib/bitcoin bitcoin 
-```
-command, edit `external.env` file paths and then by starting docker-compose with `--env=external.env` option
+#### Default build commands
 
-### Editing compose file
+- **Bitcoin Core**: we disable wallet in the release build, but leaving it for
+  nightly builds such it will be possible to play with signet & testnet
+  transactions.
+    - latest & version tagged:
+      `docker build Dockerfile/bitcoind --build-arg VERSION=<version> --build-arg DISABLE_WALLET=`
+    - nightly build:
+      `docker build Dockerfile/bitcoind`
+- **c-Lightning**: nightly version has developer features enabled and is built
+  with bitcoin-cli coming from the nightly Bitcoin Core build
+    - latest & version tagged:
+      `docker build Dockerfile/lightningd --build-arg VERSION=<version>`
+    - nightly build:
+      `docker build Dockerfile/lightningd --build-arg BITCOIN_VERSION=nightly --build-arg DEVELOPER=true`
+- **Elements**: since there is not a lot of liquid-enabled wallets, here we
+  enable wallet in all builds
+    - latest & version tagged:
+      `docker build Dockerfile/elementsd --build-arg VERSION=<version>`
+    - nightly build:
+      `docker build Dockerfile/elementsd`
+- **Electrs**:
+    - latest & version tagged:
+      `docker build Dockerfile/electrs --build-arg VERSION=<version>`
+    - nightly build:
+      `docker build Dockerfile/electrs`
 
-Replace all occurrences of `blockchain` string within the volumes block with the desired destination directory. 
-To locate volumes look for the following pattern:
-```yaml
-    volumes:
-      - "blockchain:/var/lib/bitcoind"
-```
-so it will become, for example
-```yaml
-    volumes:
-      - "/Volumes/ExternalDrive/bitcoin:/var/lib/bitcoind"
-```
+#### Bitcoin Core
 
-In this case you will need to copy `bitcoin.conf` file to that destination; otherwise bitcoind will run with the
-default parameters
+If you are planning to create your own docker image builds, remember the 
+following:
 
-## Creating container from the command line
+- you need to specify `VERSION` arg value to the docker if you'd like to 
+  build a specific version; otherwise/by default docker will build the latest  
+  master (=nightly build)
+- you need to set `DISABLE_WALLET` arg to an empty string if you'd like 
+  the build to include wallet functionality:
+  `docker build . --build-arg DISABLE_WALLET=`
+  If this argument is not provided bitcoin core is built with wallet backed
+  by the new (5th) version of BerkleyDB storage, meaning that old Bitcoin Core
+  wallets can't be imported.
+
+
+### Changing blockchain directory location
+
+You can use your existing bitcoin blockchain directory using the following steps:
+1. Create docker volume pointing to it with
+    ```shell script
+    docker volume create --driver local \
+                         --opt o=bind \
+                         --opt type=none \
+                         --opt device=/var/lib/bitcoin \
+                         bitcoin
+    docker volume create --driver local \
+                         --opt o=bind \
+                         --opt type=none \
+                         --opt device=/var/lib/lightning \
+                         lightning 
+    docker volume create --driver local \
+                         --opt o=bind \
+                         --opt type=none \
+                         --opt device=/var/lib/elements \
+                         elements 
+    docker volume create --driver local \
+                         --opt o=bind \
+                         --opt type=none \
+                         --opt device=/var/lib/electrs \
+                         electrs 
+    ```
+   where `/var/lib/bitcoin` etc must be replaced with your destination directories
+2. Edit `docker-compose/.env` file paths
+3. When starting docker-compose from within an appropriate `docker-compose.yml` 
+   file directory provide it with `-env=../.env` option
+
+### Creating container from the command line
 
 Execute the following command:
 ```shell script
 docker run \
   -p 8332:8332 -p 8333:8333 \
-  -v /Volumes/ExternalDrive/bitcoin:/var/lib/bitcoind \
+  -v /var/lib/bitcoin:bitcoin \
   --name bitcoind \
   lnpbp/bitcoind:latest
 ```
- with replacing "/Volumes/ExternalDrive/bitcoin" with the desired location for the blockchain data.
- 
- You do not need to clone this git repository to execute this command, however you will need to copy `bitcoin.conf` file 
- to that destination beforehand; otherwise bitcoind will run with the default parameters
-
-
-## Using command-line tools
-
-The most simple way of using tools is to create aliases:
-```shell script
-alias bitcoin-cli='docker exec bitcoind-mainnet bitcoin-cli -rpcpassword=bitcoin -rpcuser=bitcoin'
-alias lightning-cli='docker exec lightningd-mainnet lightning-cli --mainnet --lightning-dir /var/lib/lightningd'
-alias liquid-cli='docker exec elementsd-liquidv1 elements-cli -chain=liquidv1 -rpccookiefile=/var/lib/elementsd/liquidv1/.cookie'
-alias signet-cli='docker exec bitcoind-signet bitcoin-cli --signet -rpcpassword=bitcoin -rpcuser=bitcoin'
-alias sightning-cli='docker exec lightningd-signet lightning-cli --signet --lightning-dir /var/lib/lightningd'
-```
+with replacing `/var/lib/bitcoin` with the desired location for the blockchain
+data.
