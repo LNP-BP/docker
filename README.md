@@ -25,6 +25,15 @@ To modify the default JSON-RPC user name, password, IP addresses and other
 options edit `command` and `env` sections in a used `docker-compose.yml` file
 
 
+## Design principles
+
+1. When you do not need to expose RPC ports to the external world leave them exposed only through docker-compose `expose` but not `port` command.
+2. In docker-compose connectivity always rely on internal network only; since there might be alternative compose files using same ports on the same IP addresses (for instance for scalability purposes).
+3. Customize as much as possible with `ARG` variables.
+4. Structure `ENTRYPOINT` in a way that it can be extended with compose `command` args later.
+5. For RPC use macaroons/files whenever possible (not implemented yet, needs a separate issue).
+6. Run container processes using an unprivileged user instead of root.
+
 ## Detailed instructions
 
 ### Using command-line tools
