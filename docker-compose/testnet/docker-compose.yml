@@ -59,7 +59,7 @@ services:
     restart: unless-stopped
     depends_on:
       - bitcoind-testnet
-    environment:
+    command:
       - "--testnet"
       - "--log-level=debug"
       - "--bitcoin-rpcuser=bitcoin"
