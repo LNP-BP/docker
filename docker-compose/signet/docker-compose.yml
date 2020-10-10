@@ -70,6 +70,25 @@ services:
     networks:
       - bitcoinrpc
 
+  rgbd-signet:
+    container_name: rgbd-signet
+    image: lnpbp/rgbd:0.1.0-rc1
+    restart: unless-stopped
+    depends_on:
+      - bitcoind-signet
+      - electrs-signet
+    environment:
+      FUNGIBLED_RPC_ENDPOINT: "lnp://{node_id}@0.0.0.0:13015"
+    command:
+      - "-vvvv"
+      # - "--network signet"
+    ports:
+      - 13015:13015
+    volumes:
+      - rgb:/var/lib/rgb
+    networks:
+      - bitcoinrpc
+
 volumes:
   bitcoin:
     external: "${BITCOIN_VOLUME_EXTERNAL:-false}"
@@ -77,6 +96,8 @@ volumes:
     external: "${ELECTRS_VOLUME_EXTERNAL:-false}"
   lightning:
     external: "${LIGHTNING_VOLUME_EXTERNAL:-false}"
+  rgb:
+    external: "${RGB_VOLUME_EXTERNAL:-false}"
 
 networks:
   bitcoinrpc:

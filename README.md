@@ -75,6 +75,13 @@ alias sightning-cli='docker exec lightningd-signet lightning-cli --lightning-dir
       `docker build Dockerfile/electrs --build-arg VERSION=<version>`
     - nightly build:
       `docker build Dockerfile/electrs`
+- **RGB Node**:
+    - latest:
+      `docker build Dockerfile/rgbd --build-arg`
+    - version tagged:
+      `docker build Dockerfile/rgbd --build-arg VERSION=<version>`
+    - nightly build:
+      `docker build Dockerfile/rgbd --build-arg VERSION=`
 
 #### Bitcoin Core
 
@@ -116,7 +123,12 @@ You can use your existing bitcoin blockchain directory using the following steps
                          --opt o=bind \
                          --opt type=none \
                          --opt device=/var/lib/electrs \
-                         electrs 
+                         electrs
+    docker volume create --driver local \
+                         --opt o=bind \
+                         --opt type=none \
+                         --opt device=/private/var/lib/rgb \
+                         rgb
     ```
    where `/var/lib/bitcoin` etc must be replaced with your destination directories
 2. Edit `docker-compose/.env` file paths
