@@ -5,7 +5,7 @@ FROM rustlang/rust:nightly-slim as builder
 
 ARG SRC_DIR=/usr/local/src/rgb
 ARG BUILDER_DIR
-ARG VERSION=0.1.0-rc.1
+ARG VERSION=0.1.0-rc.2
 
 RUN apt-get update \
     && apt-get -y install --no-install-recommends \
