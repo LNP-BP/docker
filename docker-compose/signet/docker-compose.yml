@@ -72,7 +72,7 @@ services:
 
   rgbd-signet:
     container_name: rgbd-signet
-    image: lnpbp/rgbd:0.1.0-rc1
+    image: lnpbp/rgbd:latest
     restart: unless-stopped
     depends_on:
       - bitcoind-signet
@@ -81,7 +81,6 @@ services:
       FUNGIBLED_RPC_ENDPOINT: "lnp://{node_id}@0.0.0.0:13015"
     command:
       - "-vvvv"
-      # - "--network signet"
     ports:
       - 13015:13015
     volumes:
