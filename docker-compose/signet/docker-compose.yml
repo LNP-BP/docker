@@ -31,6 +31,7 @@ services:
       ELECTRS_DAEMON_RPC_ADDR: "bitcoind-signet:38332"
       ELECTRS_ELECTRUM_RPC_ADDR: "electrs-signet:60601"
       ELECTRS_MONITORING_ADDR: "electrs-signet:34224"
+      ELECTRS_COOKIE_FILE: "/var/lib/bitcoin/signet/.cookie"
     ports:
       - 60601:60601
     expose:
