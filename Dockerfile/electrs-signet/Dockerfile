@@ -44,7 +44,7 @@ RUN groupadd -r electrs && useradd -r -m -g electrs electrs \
     && chmod 700 "$ELECTRS_DATA" \
     && chown -R electrs:electrs "$ELECTRS_DATA"
 
-VOLUME "/var/lib/bitcoind"
+VOLUME "/var/lib/bitcoin"
 VOLUME "/var/lib/electrs"
 
 # Electrum X RPC port for signet
