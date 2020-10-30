@@ -44,9 +44,6 @@ ARG DATA_DIR=/var/lib/electrs
 
 COPY --from=builder /usr/local/cargo/bin/electrs $BIN_DIR
 
-RUN mkdir /etc/electrs \
-    && echo 'cookie = "bitcoin:bitcoin"' > /etc/electrs/config.toml
-
 RUN groupadd -r electrs && useradd -r -m -g electrs electrs \
     && mkdir -p "$DATA_DIR" \
     && chmod 700 "$DATA_DIR" \
