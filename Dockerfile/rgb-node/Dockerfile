@@ -5,7 +5,7 @@ FROM rust:1.47.0-slim-buster as builder
 
 ARG SRC_DIR=/usr/local/src/rgb
 ARG BUILDER_DIR
-ARG VERSION=0.1.0
+ARG VERSION=0.2.1
 
 RUN apt-get update \
     && apt-get -y install --no-install-recommends \
@@ -22,7 +22,7 @@ RUN cargo build --release
 
 RUN mkdir "${BUILDER_DIR}"
 
-RUN cargo install --path . --root "${BUILDER_DIR}"
+RUN cargo install --path . --root "${BUILDER_DIR}" --bins --all-features
 
 
 FROM debian:buster-slim
