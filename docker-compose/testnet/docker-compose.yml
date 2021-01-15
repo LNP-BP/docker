@@ -91,6 +91,24 @@ services:
     networks:
       - bitcoinrpc
 
+  lnpd-testnet:
+    container_name: lnpd-testnet
+    image: lnpbp/lnpd:latest
+    restart: unless-stopped
+    depends_on:
+      - bitcoind-testnet
+      - electrs-testnet
+      - rgbd-testnet
+    command:
+      - "-vvvv"
+      - "--network=testnet"
+    ports:
+      - 9736:9735
+    volumes:
+      - lnp:/var/lib/lnp
+    networks:
+      - bitcoinrpc
+
 volumes:
   bitcoin:
       external: "${BITCOIN_VOLUME_EXTERNAL:-false}"
@@ -100,6 +118,8 @@ volumes:
       external: "${LIGHTNING_VOLUME_EXTERNAL:-false}"
   rgb:
     external: "${RGB_VOLUME_EXTERNAL:-false}"
+  lnp:
+    external: "${LNP_VOLUME_EXTERNAL:-false}"
 
 networks:
   bitcoinrpc:
