@@ -5,7 +5,8 @@ This containers are maintained by LNP/BP Standards Association
 - **Bitcoin Core**: <https://hub.docker.com/r/lnpbp/bitcoind>
 - **c-Lightning**: <https://hub.docker.com/r/lnpbp/lightningd>
 - **Electrs**: <https://hub.docker.com/r/lnpbp/electrs>
-- **RGB Node**: <https://hub.docker.com/r/lnpbp/rgb-node>
+- **RGB Node**: <https://hub.docker.com/r/lnpbp/rgbd>
+- **LNP Node**: <https://hub.docker.com/r/lnpbp/lnpd>
 
 
 ## Quickstart
@@ -77,9 +78,14 @@ alias sightning-cli='docker exec lightningd-signet lightning-cli --lightning-dir
       `docker build Dockerfile/electrs`
 - **RGB Node**:
     - latest && version tagged:
-      `docker build Dockerfile/rgbd --build-arg VERSION=<version>`
+      `docker build Dockerfile/rgb-node --build-arg VERSION=<version>`
     - nightly build:
-      `docker build Dockerfile/rgbd`
+      `docker build Dockerfile/rgb-node`
+- **LNP Node**:
+    - latest && version tagged:
+      `docker build Dockerfile/lnp-node --build-arg VERSION=<version>`
+    - nightly build:
+      `docker build Dockerfile/lnp-node`
 
 #### Bitcoin Core
 
@@ -127,6 +133,11 @@ You can use your existing bitcoin blockchain directory using the following steps
                          --opt type=none \
                          --opt device=/var/lib/rgb \
                          rgb
+    docker volume create --driver local \
+                         --opt o=bind \
+                         --opt type=none \
+                         --opt device=/var/lib/lnp \
+                         lnp
     ```
    where `/var/lib/bitcoin` etc must be replaced with your destination directories
 2. Edit `docker-compose/.env` file paths
