@@ -34,7 +34,6 @@ RUN apt-get update \
     && apt-get -y install --no-install-recommends \
        libsqlite3-0 \
        libssl1.1 \
-       tini \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -49,7 +48,7 @@ USER ${USER}
 
 VOLUME "$DATA_DIR"
 
-ENTRYPOINT ["/usr/bin/tini", "-g", "--", "/usr/local/bin/rgbd", \
-			"--bin-dir", "/usr/local/bin", "--data-dir", "/var/lib/rgb"]
+ENTRYPOINT ["/usr/local/bin/rgbd", \
+			"--bin-dir=/usr/local/bin", "--data-dir=/var/lib/rgb"]
 
 CMD ["-vvvv"]
