@@ -5,7 +5,7 @@ FROM rust:1.47.0-slim-buster as builder
 
 ARG SRC_DIR=/usr/local/src/rgb
 ARG BUILDER_DIR
-ARG VERSION=0.2.1
+ARG VERSION
 
 RUN apt-get update \
     && apt-get -y install --no-install-recommends \
@@ -18,11 +18,9 @@ RUN git clone -n https://github.com/LNP-BP/rgb-node.git . \
     && git checkout ${VERSION:+tags/v}${VERSION:-master}
 
 
-RUN cargo build --release
-
 RUN mkdir "${BUILDER_DIR}"
 
-RUN cargo install --path . --root "${BUILDER_DIR}" --bins --all-features
+RUN cargo install --path . --locked --root "${BUILDER_DIR}" --bins --all-features
 
 
 FROM debian:buster-slim

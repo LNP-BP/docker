@@ -72,6 +72,25 @@ services:
     networks:
       - bitcoinrpc
 
+  rgbd-testnet:
+    container_name: rgbd-testnet
+    image: lnpbp/rgbd:latest
+    restart: unless-stopped
+    depends_on:
+      - bitcoind-testnet
+      - electrs-testnet
+    environment:
+      FUNGIBLED_RPC_ENDPOINT: "lnp://{node_id}@0.0.0.0:13025"
+    command:
+      - "-vvvv"
+      - "--network=testnet"
+    ports:
+      - 13025:13025
+    volumes:
+      - rgb:/var/lib/rgb
+    networks:
+      - bitcoinrpc
+
 volumes:
   bitcoin:
       external: "${BITCOIN_VOLUME_EXTERNAL:-false}"
@@ -79,6 +98,8 @@ volumes:
       external: "${ELECTRS_VOLUME_EXTERNAL:-false}"
   lightning:
       external: "${LIGHTNING_VOLUME_EXTERNAL:-false}"
+  rgb:
+    external: "${RGB_VOLUME_EXTERNAL:-false}"
 
 networks:
   bitcoinrpc:

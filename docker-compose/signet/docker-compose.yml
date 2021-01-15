@@ -83,6 +83,7 @@ services:
       FUNGIBLED_RPC_ENDPOINT: "lnp://{node_id}@0.0.0.0:13015"
     command:
       - "-vvvv"
+      - "--network=signet"
     ports:
       - 13015:13015
     volumes:
