@@ -46,6 +46,8 @@ alias lightning-cli='docker exec lightningd-mainnet lightning-cli --lightning-di
 alias liquid-cli='docker exec elementsd-liquidv1 elements-cli --datadir=/var/lib/elements -chain=liquidv1 -rpcuser=bitcoin -rpcpassword=bitcoin'
 alias signet-cli='docker exec bitcoind-signet bitcoin-cli --datadir=/var/lib/bitcoin --signet -rpcpassword=bitcoin -rpcuser=bitcoin'
 alias sightning-cli='docker exec lightningd-signet lightning-cli --lightning-dir=/var/lib/lightning --signet --lightning-dir /var/lib/lightning'
+alias rgb-cli='docker exec rgbd-signet rgb-cli -n signet'
+alias lnp-cli='docker exec lnpd-signet lnp-cli -n signet -d /var/lib/lnp'
 ```
 
 ### Customizing docker images
