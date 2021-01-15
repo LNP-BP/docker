@@ -23,7 +23,7 @@ services:
 
   electrs-signet:
     container_name: electrs-signet
-    image: lnpbp/electrs:signet
+    image: lnpbp/electrs:latest
     restart: unless-stopped
     depends_on:
       - bitcoind-signet
@@ -54,7 +54,7 @@ services:
 
   lightningd-signet:
     container_name: lightningd-signet
-    image: lnpbp/lightningd:nightly
+    image: lnpbp/lightningd:latest
     restart: unless-stopped
     depends_on:
       - bitcoind-signet

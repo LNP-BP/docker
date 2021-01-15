@@ -22,7 +22,7 @@ RUN git clone -n https://github.com/romanz/electrs.git $SRC_DIR \
     && cd $SRC_DIR \
     && git checkout ${VERSION:+tags/v}${VERSION:-master}
 
-RUN cargo install --path .
+RUN cargo install --path . --locked
 
 
 
