@@ -127,7 +127,7 @@ You can use your existing bitcoin blockchain directory using the following steps
     docker volume create --driver local \
                          --opt o=bind \
                          --opt type=none \
-                         --opt device=/private/var/lib/rgb \
+                         --opt device=/var/lib/rgb \
                          rgb
     ```
    where `/var/lib/bitcoin` etc must be replaced with your destination directories
