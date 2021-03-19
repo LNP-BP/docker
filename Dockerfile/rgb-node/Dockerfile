@@ -14,7 +14,7 @@ RUN apt-get update \
 
 WORKDIR "$SRC_DIR"
 
-RUN git clone -n https://github.com/LNP-BP/rgb-node.git . \
+RUN git clone -n https://github.com/rgb-org/rgb-node.git . \
     && git checkout ${VERSION:+tags/v}${VERSION:-master}
 
 
@@ -51,4 +51,4 @@ VOLUME "$DATA_DIR"
 ENTRYPOINT ["/usr/local/bin/rgbd", \
 			"--bin-dir=/usr/local/bin", "--data-dir=/var/lib/rgb"]
 
-CMD ["-vvvv"]
+CMD ["-vvv"]
