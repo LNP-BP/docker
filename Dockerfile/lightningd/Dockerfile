@@ -25,15 +25,19 @@ RUN apt-get update -y \
         libgmp-dev \
         libsqlite3-dev \
         libtool \
+	libsodium-dev \
         python \
         python3 \
         python3-mako \
+	python3-pip \
+	net-tools \
         tclsh \
         unzip \
         wget \
         zlib1g-dev \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && pip3 install setuptools mrkd mistune==0.8.4
 
 WORKDIR $SRC_DIR
 
