@@ -55,6 +55,7 @@ services:
     depends_on:
       - bitcoind-mainnet
     environment:
+      RUSTi_LOG: "ERROR"
       ELECTRS_DAEMON_RPC_ADDR: "bitcoind-mainnet:8332"
       ELECTRS_ELECTRUM_RPC_ADDR: "electrs-mainnet:50001"
       ELECTRS_MONITORING_ADDR: "electrs-mainnet:4224"

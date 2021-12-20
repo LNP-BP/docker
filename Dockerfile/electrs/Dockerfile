@@ -64,4 +64,4 @@ STOPSIGNAL SIGINT
 
 ENTRYPOINT ["electrs", "--daemon-dir", "/var/lib/bitcoin", "--db-dir", "/var/lib/electrs"]
 
-CMD ["-vvvv"]
+CMD []
