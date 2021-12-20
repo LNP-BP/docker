@@ -103,7 +103,7 @@ services:
       - "-vvvv"
       - "--network=testnet"
     ports:
-      - 9736:9735
+      - 9736:19735
     volumes:
       - lnp:/var/lib/lnp
     networks:
