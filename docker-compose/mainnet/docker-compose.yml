@@ -1,22 +1,5 @@
 version: '3.2'
 services:
-  lightning:
-    container_name: lightning
-    image: lnpbp/lightningd:latest
-    restart: unless-stopped
-    command:
-      - "--mainnet"
-      - "--bitcoin-rpcuser=bitcoin"
-      - "--bitcoin-rpcpassword=bitcoin"
-      - "--bitcoin-rpcconnect=bitcoind-mainnet"
-      - "--log-level=debug"
-    # ports:
-    # - 29735:9735
-    networks:
-      - bitcoinrpc     
-    volumes:
-      - /home/orlovsky/.lightning:/var/lib/lightning
-
   bitcoind-mainnet:
     container_name: bitcoind-mainnet
     image: lnpbp/bitcoind:latest
