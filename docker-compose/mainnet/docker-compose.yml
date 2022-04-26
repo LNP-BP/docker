@@ -1,5 +1,22 @@
 version: '3.2'
 services:
+  lightning:
+    container_name: lightning
+    image: lnpbp/lightningd:latest
+    restart: unless-stopped
+    command:
+      - "--mainnet"
+      - "--bitcoin-rpcuser=bitcoin"
+      - "--bitcoin-rpcpassword=bitcoin"
+      - "--bitcoin-rpcconnect=bitcoind-mainnet"
+      - "--log-level=debug"
+    # ports:
+    # - 29735:9735
+    networks:
+      - bitcoinrpc     
+    volumes:
+      - /home/orlovsky/.lightning:/var/lib/lightning
+
   bitcoind-mainnet:
     container_name: bitcoind-mainnet
     image: lnpbp/bitcoind:latest
@@ -57,6 +74,7 @@ services:
     environment:
       RUSTi_LOG: "ERROR"
       ELECTRS_DAEMON_RPC_ADDR: "bitcoind-mainnet:8332"
+      ELECTRS_DAEMON_P2P_ADDR: "bitcoind-mainnet:8333"
       ELECTRS_ELECTRUM_RPC_ADDR: "electrs-mainnet:50001"
       ELECTRS_MONITORING_ADDR: "electrs-mainnet:4224"
       ELECTRS_COOKIE_FILE: "/var/lib/bitcoin/.cookie"
