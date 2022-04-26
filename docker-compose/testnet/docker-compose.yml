@@ -30,6 +30,7 @@ services:
     environment:
       ELECTRS_NETWORK: "testnet"
       ELECTRS_DAEMON_RPC_ADDR: "bitcoind-testnet:18332"
+      ELECTRS_DAEMON_P2P_ADDR: "bitcoind-testnet:18333"
       ELECTRS_ELECTRUM_RPC_ADDR: "electrs-testnet:60001"
       ELECTRS_MONITORING_ADDR: "electrs-testnet:14223"
       ELECTRS_COOKIE_FILE: "/var/lib/bitcoin/testnet3/.cookie"
